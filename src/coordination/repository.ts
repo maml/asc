@@ -175,17 +175,22 @@ export class CoordinationRepository {
     };
   }
 
-  async emitEvent(coordinationId: CoordinationId, traceId: TraceId, payload: CoordinationEventPayload): Promise<void> {
+  async emitEvent(
+    coordinationId: CoordinationId,
+    traceId: TraceId,
+    payload: CoordinationEventPayload,
+    broadcastExtra?: Record<string, unknown>
+  ): Promise<void> {
     await this.pool.query(
       `INSERT INTO coordination_events (coordination_id, trace_id, event_type, payload)
        VALUES ($1, $2, $3, $4)`,
       [coordinationId, traceId, payload.type, JSON.stringify(payload)]
     );
 
-    // Broadcast to connected WebSocket clients
+    // Broadcast to connected WebSocket clients (broadcastExtra is WS-only, not persisted)
     this.broadcaster?.broadcast({
       type: payload.type,
-      payload: { coordinationId, traceId, ...payload },
+      payload: { coordinationId, traceId, ...payload, ...broadcastExtra },
       timestamp: new Date().toISOString(),
     });
   }

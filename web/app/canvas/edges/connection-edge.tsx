@@ -9,7 +9,7 @@ function ConnectionEdgeInner(props: EdgeProps) {
 
   return (
     <>
-      <BaseEdge path={edgePath} style={{ stroke: "var(--border)", strokeWidth: 1 }} />
+      <BaseEdge path={edgePath} style={{ stroke: "rgba(148, 163, 184, 0.6)", strokeWidth: 1.5 }} />
       {label && (
         <foreignObject x={labelX - 20} y={labelY - 10} width={40} height={20} className="pointer-events-none">
           <div className="flex h-full items-center justify-center">

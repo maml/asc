@@ -9,13 +9,13 @@ export interface SystemNodeData {
   [key: string]: unknown;
 }
 
-// Fixed positions — architecture is static
+// Fixed positions — spread out for comfortable default fitView
 export const initialNodes: Node<SystemNodeData>[] = [
-  // Consumer group
+  // Consumer group — far left
   {
     id: "group-consumers",
     type: "group",
-    position: { x: 0, y: 0 },
+    position: { x: 0, y: 60 },
     data: { label: "Consumers", status: "healthy" as NodeStatus, metrics: {} },
     style: { width: 220, height: 140 },
   },
@@ -27,25 +27,25 @@ export const initialNodes: Node<SystemNodeData>[] = [
     parentId: "group-consumers",
     extent: "parent" as const,
   },
-  // ASC Backend
+  // ASC Backend — center
   {
     id: "backend",
     type: "backend",
-    position: { x: 350, y: 30 },
+    position: { x: 420, y: 60 },
     data: { label: "ASC Engine", status: "healthy" as NodeStatus, metrics: { activeTasks: 0, eventsPerMin: 0, uptime: "0s" } },
   },
-  // Database
+  // Database — far right
   {
     id: "postgres",
     type: "postgres",
-    position: { x: 700, y: 30 },
+    position: { x: 820, y: 60 },
     data: { label: "PostgreSQL", status: "healthy" as NodeStatus, metrics: { connection: "connected" } },
   },
-  // Agent group
+  // Agent group — centered below backend
   {
     id: "group-agents",
     type: "group",
-    position: { x: 250, y: 250 },
+    position: { x: 300, y: 320 },
     data: { label: "Agents", status: "healthy" as NodeStatus, metrics: {} },
     style: { width: 520, height: 170 },
   },

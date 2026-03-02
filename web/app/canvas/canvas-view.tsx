@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ReactFlow,
+  ReactFlowProvider,
+  useReactFlow,
   Background,
   Controls,
   MiniMap,
@@ -37,6 +39,9 @@ import { DataFlowEdge } from "./edges/data-flow-edge";
 
 import { MetricsPanel } from "./overlays/metrics-panel";
 import { EventTimeline } from "./overlays/event-timeline";
+import { TopologyToggle, type TopologyMode } from "./overlays/topology-toggle";
+import { CanvasEmptyState } from "./overlays/canvas-empty-state";
+import { useLiveTopology } from "./hooks/use-live-topology";
 
 const nodeTypes: NodeTypes = {
   consumer: ConsumerNode,
@@ -51,17 +56,73 @@ const edgeTypes: EdgeTypes = {
   dataFlow: DataFlowEdge,
 };
 
+function getStoredMode(): TopologyMode {
+  if (typeof window === "undefined") return "example";
+  return (localStorage.getItem("asc-topology-mode") as TopologyMode) ?? "example";
+}
+
+// Re-fit the viewport when the live topology structure changes
+function FitViewOnChange({ fingerprint }: { fingerprint: string }) {
+  const { fitView } = useReactFlow();
+  const prevRef = useRef("");
+
+  useEffect(() => {
+    if (!fingerprint || fingerprint === prevRef.current) return;
+    prevRef.current = fingerprint;
+    // Small delay so ReactFlow has processed the new nodes before fitting
+    const timer = setTimeout(() => fitView({ padding: 0.3, duration: 300 }), 50);
+    return () => clearTimeout(timer);
+  }, [fingerprint, fitView]);
+
+  return null;
+}
+
 export function CanvasView() {
-  const [nodes, setNodes] = useState<Node<SystemNodeData>[]>(() =>
-    applyStoredPositions(initialNodes)
+  return (
+    <ReactFlowProvider>
+      <CanvasViewInner />
+    </ReactFlowProvider>
   );
+}
+
+function CanvasViewInner() {
+  const [topologyMode, setTopologyMode] = useState<TopologyMode>(getStoredMode);
+  const isLive = topologyMode === "live";
+
+  const [nodes, setNodes] = useState<Node<SystemNodeData>[]>(initialNodes);
   const [edges, setEdges] = useState<Edge[]>(initialEdges);
 
+  const [registryVersion, setRegistryVersion] = useState(0);
+  const live = useLiveTopology(isLive, registryVersion);
+
   const engineRef = useRef(new AnimationEngine());
+  const taskAgentMap = useRef<Map<string, string>>(new Map());
   const { savePositions } = useCanvasLayout();
   const { lastEvent, isConnected, events } = useWebSocket();
-  const { status } = useSystemStatus(5000);
+  const { status } = useSystemStatus(5000, registryVersion);
   const [latencyHistory, setLatencyHistory] = useState<Record<string, number[]>>({});
+
+  // Swap topology data source when mode changes
+  useEffect(() => {
+    if (isLive) {
+      setNodes(live.nodes);
+      setEdges(live.edges);
+    } else {
+      setNodes(applyStoredPositions(initialNodes));
+      setEdges(initialEdges);
+    }
+    engineRef.current.clear();
+  }, [topologyMode, live.nodes, live.edges, isLive]);
+
+  const handleModeChange = useCallback((mode: TopologyMode) => {
+    localStorage.setItem("asc-topology-mode", mode);
+    setTopologyMode(mode);
+  }, []);
+
+  // Restore saved positions after mount (avoids hydration mismatch)
+  useEffect(() => {
+    setNodes((nds) => applyStoredPositions(nds));
+  }, []);
 
   const onNodesChange: OnNodesChange = useCallback(
     (changes) => {
@@ -124,7 +185,7 @@ export function CanvasView() {
               ? "degraded"
               : agentStatus.healthy
                 ? "healthy"
-                : "unknown";
+                : "unhealthy";
 
           return {
             ...node,
@@ -154,18 +215,77 @@ export function CanvasView() {
     const agentId = payload.agentId as string | undefined;
 
     switch (lastEvent.type) {
-      case "task_started":
+      case "task_created": {
+        // Track which agent this task is for
         if (taskId && agentId) {
-          engineRef.current.startFlow(taskId, agentId);
+          taskAgentMap.current.set(taskId, agentId);
         }
         break;
-      case "task_completed":
-        if (taskId) engineRef.current.completeFlow(taskId);
+      }
+      case "task_started": {
+        const resolvedAgentId = agentId ?? taskAgentMap.current.get(taskId ?? "");
+        if (taskId && resolvedAgentId) {
+          // In live mode, consumer edges use e-{consumerId}-backend pattern
+          const consumerId = payload.consumerId as string | undefined;
+          const consumerEdge = consumerId ? `e-${consumerId}-backend` : undefined;
+          engineRef.current.startFlow(taskId, resolvedAgentId, consumerEdge);
+        }
+        // Update node metrics
+        setNodes((nds) =>
+          nds.map((n) => {
+            if (n.id === "backend") {
+              const current = Number(n.data.metrics.activeTasks ?? 0);
+              return { ...n, data: { ...n.data, metrics: { ...n.data.metrics, activeTasks: current + 1 } } };
+            }
+            if (n.type === "consumer") {
+              const current = Number(n.data.metrics.requests ?? 0);
+              return { ...n, data: { ...n.data, metrics: { ...n.data.metrics, requests: current + 1, lastRequest: new Date().toLocaleTimeString("en-US", { hour12: false, hour: "2-digit", minute: "2-digit", second: "2-digit" }) } } };
+            }
+            return n;
+          })
+        );
         break;
+      }
+      case "task_completed": {
+        if (taskId) {
+          engineRef.current.completeFlow(taskId);
+          taskAgentMap.current.delete(taskId);
+        }
+        // Decrement active tasks
+        setNodes((nds) =>
+          nds.map((n) => {
+            if (n.id === "backend") {
+              const current = Math.max(0, Number(n.data.metrics.activeTasks ?? 0) - 1);
+              return { ...n, data: { ...n.data, metrics: { ...n.data.metrics, activeTasks: current } } };
+            }
+            return n;
+          })
+        );
+        break;
+      }
       case "task_failed":
-      case "task_timeout":
-        if (taskId) engineRef.current.failFlow(taskId);
+      case "task_timeout": {
+        if (taskId) {
+          engineRef.current.failFlow(taskId);
+          taskAgentMap.current.delete(taskId);
+        }
+        // Decrement active tasks
+        setNodes((nds) =>
+          nds.map((n) => {
+            if (n.id === "backend") {
+              const current = Math.max(0, Number(n.data.metrics.activeTasks ?? 0) - 1);
+              return { ...n, data: { ...n.data, metrics: { ...n.data.metrics, activeTasks: current } } };
+            }
+            return n;
+          })
+        );
         break;
+      }
+      case "registry_changed": {
+        // Bump version to trigger immediate re-fetch in useLiveTopology
+        setRegistryVersion((v) => v + 1);
+        break;
+      }
       case "circuit_state_change": {
         // Update agent node circuit state immediately
         const cbAgentId = agentId;
@@ -211,27 +331,33 @@ export function CanvasView() {
     return () => clearInterval(interval);
   }, []);
 
-  // Connection indicator
-  const connectionDot = useMemo(
+  // Connection indicator + topology toggle
+  const topBar = useMemo(
     () => (
-      <div className="absolute top-4 left-4 z-20 flex items-center gap-2 rounded-lg border border-border-subtle bg-surface px-3 py-1.5">
-        <span
-          className="h-2 w-2 rounded-full"
-          style={{ backgroundColor: isConnected ? "#10b981" : "#ef4444" }}
-        />
-        <span className="text-[11px] font-mono text-muted-foreground">
-          {isConnected ? "Live" : "Disconnected"}
-        </span>
+      <div className="absolute top-4 left-4 z-20 flex items-center gap-2">
+        <div className="flex items-center gap-2 rounded-lg border border-border-subtle bg-surface px-3 py-1.5">
+          <span
+            className="h-2 w-2 rounded-full"
+            style={{ backgroundColor: isConnected ? "#10b981" : "#ef4444" }}
+          />
+          <span className="text-[11px] font-mono text-muted-foreground">
+            {isConnected ? "Connected" : "Disconnected"}
+          </span>
+        </div>
+        <TopologyToggle mode={topologyMode} onChange={handleModeChange} />
       </div>
     ),
-    [isConnected]
+    [isConnected, topologyMode, handleModeChange]
   );
 
   return (
     <div className="relative h-[calc(100vh-var(--header-height))] w-full" style={{ backgroundColor: "var(--canvas-bg)" }}>
-      {connectionDot}
+      {topBar}
+
+      {isLive && live.isEmpty && !live.loading && <CanvasEmptyState />}
 
       <ReactFlow
+        key={topologyMode}
         nodes={nodes}
         edges={edges}
         onNodesChange={onNodesChange}
@@ -243,6 +369,7 @@ export function CanvasView() {
         maxZoom={2}
         proOptions={{ hideAttribution: true }}
       >
+        {isLive && <FitViewOnChange fingerprint={live.fingerprint} />}
         <Background color="var(--canvas-grid)" gap={20} size={1} />
         <Controls position="bottom-right" />
         <MiniMap
@@ -253,7 +380,11 @@ export function CanvasView() {
         />
       </ReactFlow>
 
-      <MetricsPanel status={status} latencyHistory={latencyHistory} />
+      <MetricsPanel
+        status={status}
+        latencyHistory={latencyHistory}
+        visibleAgentIds={isLive ? new Set(nodes.filter((n) => n.type === "agent").map((n) => n.id)) : undefined}
+      />
       <EventTimeline events={events} />
     </div>
   );

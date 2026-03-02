@@ -116,9 +116,9 @@ After a fresh setup, run through this to confirm everything works end-to-end:
 5. `cd web && npm run dev` (in a third terminal)
 6. Open http://localhost:3200/canvas
 7. Confirm all nodes show "healthy" status
-8. Register entities and submit coordinations — see [API Reference](./api-reference.md#smoke-test-walkthrough)
+8. Register entities and submit coordinations — see [[api-reference#Smoke Test Walkthrough|APi Reference]]
 9. Watch the canvas animate as tasks flow through the system
-10. Hammer the Flaky Agent to trigger circuit breaker — see [API Reference](./api-reference.md#trigger-circuit-breaker)
+10. Hammer the Flaky Agent to trigger circuit breaker — see [[api-reference#Trigger Circuit Breaker|API Reference]]
 
 ---
 

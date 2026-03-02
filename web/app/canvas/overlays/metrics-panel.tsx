@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { PanelRight, X, Activity } from "lucide-react";
+import { PanelRight, X, Activity, Info } from "lucide-react";
 import type { SystemStatus } from "../hooks/use-system-status";
 
 const circuitBadgeStyles: Record<string, string> = {
@@ -26,12 +26,25 @@ function Sparkline({ values, color }: { values: number[]; color: string }) {
   );
 }
 
+function InfoTooltip({ text }: { text: string }) {
+  return (
+    <span className="group relative ml-1 inline-flex cursor-help">
+      <Info size={11} className="text-muted-foreground/60" />
+      <span className="pointer-events-none absolute left-5 top-1/2 -translate-y-1/2 z-50 w-52 rounded-md border border-border-subtle bg-surface-raised px-2.5 py-1.5 text-[11px] font-normal normal-case tracking-normal text-muted-foreground opacity-0 shadow-lg transition-opacity group-hover:opacity-100">
+        {text}
+      </span>
+    </span>
+  );
+}
+
 interface MetricsPanelProps {
   status: SystemStatus | null;
   latencyHistory: Record<string, number[]>;
+  /** When set, only show agents present in this set (for live mode filtering) */
+  visibleAgentIds?: Set<string>;
 }
 
-export function MetricsPanel({ status, latencyHistory }: MetricsPanelProps) {
+export function MetricsPanel({ status, latencyHistory, visibleAgentIds }: MetricsPanelProps) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -61,7 +74,10 @@ export function MetricsPanel({ status, latencyHistory }: MetricsPanelProps) {
           <div className="p-4 space-y-4">
             {/* Backend */}
             <section>
-              <h3 className="text-[11px] font-medium uppercase tracking-wider text-muted mb-2">Backend</h3>
+              <h3 className="flex items-center text-[11px] font-medium uppercase tracking-wider text-muted mb-2">
+                Backend
+                <InfoTooltip text="ASC Engine health, uptime, and active WebSocket connections from the coordination backend." />
+              </h3>
               <div className="rounded-lg border border-border-subtle bg-surface-raised p-3 space-y-1.5 font-mono text-xs">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Status</span>
@@ -80,9 +96,12 @@ export function MetricsPanel({ status, latencyHistory }: MetricsPanelProps) {
 
             {/* Circuit Breakers */}
             <section>
-              <h3 className="text-[11px] font-medium uppercase tracking-wider text-muted mb-2">Circuit Breakers</h3>
+              <h3 className="flex items-center text-[11px] font-medium uppercase tracking-wider text-muted mb-2">
+                Circuit Breakers
+                <InfoTooltip text="Per-agent circuit breaker state, latency trends, and failure counts. Breakers open after repeated failures to protect the system." />
+              </h3>
               <div className="space-y-2">
-                {status?.agents.map((agent) => (
+                {status?.agents.filter((agent) => !visibleAgentIds || visibleAgentIds.has(agent.agentId)).map((agent) => (
                   <div key={agent.agentId} className="rounded-lg border border-border-subtle bg-surface-raised p-3">
                     <div className="flex items-center justify-between mb-1.5">
                       <span className="text-xs font-medium text-foreground">{agent.name}</span>

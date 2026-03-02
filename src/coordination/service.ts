@@ -62,7 +62,7 @@ export class CoordinationService {
     await this.coordRepo.emitEvent(coord.id, coord.traceId, {
       type: "task_created",
       taskId: task.id,
-    });
+    }, { agentId: request.agentId, consumerId: request.consumerId });
 
     // Execute asynchronously — don't block the response
     this.executeTask(task, agent).catch((err) => {
@@ -95,7 +95,7 @@ export class CoordinationService {
           taskId,
           error: "Circuit breaker is open",
           willRetry: false,
-        });
+        }, { agentId });
         await this.coordRepo.updateTask(taskId, {
           status: "failed",
           error: "Circuit breaker is open for this agent",
@@ -128,7 +128,7 @@ export class CoordinationService {
         type: "task_started",
         taskId,
         attemptNumber: attempt,
-      });
+      }, { agentId, consumerId: task.consumerId });
 
       // Invoke the provider
       const invokeStart = Date.now();
@@ -152,7 +152,7 @@ export class CoordinationService {
             if (!checks.passed) {
               // A required quality gate failed — treat as task failure
               await this.coordRepo.updateTask(taskId, { status: "failed", error: "Quality gate check failed" });
-              await this.coordRepo.emitEvent(coordinationId, traceId, { type: "task_failed", taskId, error: "Quality gate check failed", willRetry: false });
+              await this.coordRepo.emitEvent(coordinationId, traceId, { type: "task_failed", taskId, error: "Quality gate check failed", willRetry: false }, { agentId });
               // Still complete the trace
               try {
                 if (this.traceService && traceIdObs && rootSpanId) {
@@ -176,7 +176,7 @@ export class CoordinationService {
             type: "task_completed",
             taskId,
             output: response.output,
-          });
+          }, { agentId });
 
           // Complete trace and evaluate SLAs after success
           try {
@@ -216,7 +216,7 @@ export class CoordinationService {
           taskId,
           error: response.error ?? "Provider returned error status",
           willRetry,
-        });
+        }, { agentId });
 
         if (!willRetry) {
           await this.coordRepo.updateTask(taskId, {
@@ -245,7 +245,7 @@ export class CoordinationService {
             type: "task_timeout",
             taskId,
             elapsedMs: task.timeoutMs,
-          });
+          }, { agentId });
         }
 
         await this.coordRepo.emitEvent(coordinationId, traceId, {
@@ -253,7 +253,7 @@ export class CoordinationService {
           taskId,
           error: errorMsg,
           willRetry,
-        });
+        }, { agentId });
 
         if (!willRetry) {
           await this.coordRepo.updateTask(taskId, {

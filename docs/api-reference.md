@@ -37,9 +37,9 @@ curl -s -X POST http://localhost:3100/api/providers \
   }' | jq .
 ```
 
-Returns: `{ id: "prov_...", apiKey: "...", ... }`
+Returns: `{ data: { provider: { id: "prov_...", ... }, apiKey: "..." } }`
 
-Save the `id` — you'll need it to register agents.
+Save `data.provider.id` — you'll need it to register agents.
 
 ### List Providers
 
@@ -78,9 +78,9 @@ curl -s -X POST http://localhost:3100/api/providers/<PROVIDER_ID>/agents \
   }' | jq .
 ```
 
-Returns: `{ id: "agent_...", ... }`
+Returns: `{ data: { agent: { id: "agent_...", ... } } }`
 
-Save the `id` — you'll need it for coordination requests.
+Save `data.agent.id` — you'll need it for coordination requests.
 
 ### List Agents
 
@@ -102,9 +102,9 @@ curl -s -X POST http://localhost:3100/api/consumers \
   }' | jq .
 ```
 
-Returns: `{ id: "cons_...", ... }`
+Returns: `{ data: { consumer: { id: "cons_...", ... }, apiKey: "..." } }`
 
-Save the `id` — you'll need it for coordination requests.
+Save `data.consumer.id` — you'll need it for coordination requests.
 
 ### List Consumers
 
@@ -128,12 +128,12 @@ curl -s -X POST http://localhost:3100/api/coordinations \
   -d '{
     "consumerId": "<CONSUMER_ID>",
     "agentId": "<AGENT_ID>",
-    "input": {"message": "Hello from canvas test!"},
+    "input": {"message": "Hello from canvas test"},
     "priority": "normal"
   }' | jq .
 ```
 
-Returns: the created **Task** object (status will be `pending` or `in_progress`).
+Returns: `{ data: { coordinationId: "...", task: { id, status, ... } } }` — task status will be `pending` or `in_progress`.
 
 **Priority levels**: `low`, `normal`, `high`, `critical`
 
@@ -180,7 +180,7 @@ PROVIDER=$(curl -s -X POST http://localhost:3100/api/providers \
     "contactEmail": "test@example.com",
     "webhookUrl": "http://localhost:4100"
   }')
-PROVIDER_ID=$(echo $PROVIDER | jq -r '.id')
+PROVIDER_ID=$(echo $PROVIDER | jq -r '.data.provider.id')
 echo "Provider: $PROVIDER_ID"
 
 # 2. Register agent under that provider
@@ -195,10 +195,18 @@ AGENT=$(curl -s -X POST http://localhost:3100/api/providers/$PROVIDER_ID/agents 
     "sla": {"maxLatencyMs": 5000, "uptimePercentage": 99.9, "maxErrorRate": 0.01},
     "supportsStreaming": false
   }')
-AGENT_ID=$(echo $AGENT | jq -r '.id')
+AGENT_ID=$(echo $AGENT | jq -r '.data.agent.id')
 echo "Agent: $AGENT_ID"
 
-# 3. Register consumer
+# 2b. Activate provider and agent (they default to pending_review/draft)
+curl -s -X PATCH http://localhost:3100/api/providers/$PROVIDER_ID \
+  -H "Content-Type: application/json" \
+  -d '{"status": "active"}' | jq -r '.data.status'
+curl -s -X PATCH http://localhost:3100/api/agents/$AGENT_ID \
+  -H "Content-Type: application/json" \
+  -d '{"status": "active"}' | jq -r '.data.status'
+
+# 3. Register consumer (consumers default to active — no activation needed)
 CONSUMER=$(curl -s -X POST http://localhost:3100/api/consumers \
   -H "Content-Type: application/json" \
   -d '{
@@ -206,7 +214,7 @@ CONSUMER=$(curl -s -X POST http://localhost:3100/api/consumers \
     "description": "Canvas test client",
     "contactEmail": "consumer@example.com"
   }')
-CONSUMER_ID=$(echo $CONSUMER | jq -r '.id')
+CONSUMER_ID=$(echo $CONSUMER | jq -r '.data.consumer.id')
 echo "Consumer: $CONSUMER_ID"
 
 # 4. Submit a coordination — watch the canvas!
@@ -215,7 +223,7 @@ curl -s -X POST http://localhost:3100/api/coordinations \
   -d "{
     \"consumerId\": \"$CONSUMER_ID\",
     \"agentId\": \"$AGENT_ID\",
-    \"input\": {\"message\": \"Hello from canvas test!\"},
+    \"input\": {\"message\": \"Hello from canvas test\"},
     \"priority\": \"normal\"
   }" | jq .
 ```
@@ -239,8 +247,13 @@ FLAKY=$(curl -s -X POST http://localhost:3100/api/providers/$PROVIDER_ID/agents 
     "sla": {"maxLatencyMs": 5000, "uptimePercentage": 95.0, "maxErrorRate": 0.5},
     "supportsStreaming": false
   }')
-FLAKY_ID=$(echo $FLAKY | jq -r '.id')
+FLAKY_ID=$(echo $FLAKY | jq -r '.data.agent.id')
 echo "Flaky Agent: $FLAKY_ID"
+
+# Activate the flaky agent
+curl -s -X PATCH http://localhost:3100/api/agents/$FLAKY_ID \
+  -H "Content-Type: application/json" \
+  -d '{"status": "active"}' | jq -r '.data.status'
 
 # Spam 10 requests — some will fail, circuit should open after 5 failures
 for i in $(seq 1 10); do
@@ -252,7 +265,7 @@ for i in $(seq 1 10); do
       \"agentId\": \"$FLAKY_ID\",
       \"input\": {\"n\": $i},
       \"priority\": \"normal\"
-    }" | jq '{id, status}'
+    }" | jq '.data.task | {id, status}'
   sleep 0.5
 done
 ```

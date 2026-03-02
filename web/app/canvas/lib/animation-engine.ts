@@ -10,10 +10,10 @@ export class AnimationEngine {
   private flows = new Map<string, ActiveFlow>();
 
   // When a task starts, activate the relevant edges
-  startFlow(taskId: string, agentId: string): void {
+  startFlow(taskId: string, agentId: string, consumerEdgeId?: string): void {
     // Consumer -> Backend edge
     this.flows.set(`${taskId}-inbound`, {
-      edgeId: "e-consumer-backend",
+      edgeId: consumerEdgeId ?? "e-consumer-backend",
       color: "var(--edge-active)",
       startedAt: Date.now(),
     });

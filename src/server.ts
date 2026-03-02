@@ -25,7 +25,7 @@ import { BillingService } from "./billing/service.js";
 import { registerBillingRoutes } from "./billing/routes.js";
 import { WsBroadcaster } from "./realtime/ws-broadcaster.js";
 import { registerRealtimeRoutes } from "./realtime/routes.js";
-import type { AgentId } from "./types/brand.js";
+
 
 const PORT = parseInt(process.env["PORT"] ?? "3100", 10);
 
@@ -39,10 +39,10 @@ async function main(): Promise<void> {
   const providers = new PgProviderRepository(pool);
   const consumers = new PgConsumerRepository(pool);
   const agents = new PgAgentRepository(pool);
-  const registryService = new RegistryService(providers, consumers, agents);
-
-  // Wire up realtime broadcaster
+  // Wire up realtime broadcaster (before registry so it can emit events)
   const broadcaster = new WsBroadcaster();
+
+  const registryService = new RegistryService(providers, consumers, agents, broadcaster);
 
   // Wire up coordination engine
   const coordRepo = new CoordinationRepository(pool, broadcaster);
@@ -89,12 +89,7 @@ async function main(): Promise<void> {
   registerBillingRoutes(app, billingService);
 
   // Register realtime routes (WebSocket + system status)
-  const agentEndpoints = [
-    { agentId: "echo-agent" as AgentId, name: "Echo Agent", healthUrl: "http://localhost:4100/health" },
-    { agentId: "slow-agent" as AgentId, name: "Slow Agent", healthUrl: "http://localhost:4200/health" },
-    { agentId: "flaky-agent" as AgentId, name: "Flaky Agent", healthUrl: "http://localhost:4300/health" },
-  ];
-  registerRealtimeRoutes(app, broadcaster, circuitBreaker, agentEndpoints);
+  registerRealtimeRoutes(app, broadcaster, circuitBreaker, pool);
 
   // Graceful shutdown
   const shutdown = async () => {

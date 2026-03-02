@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { ListTodo, Plus, RefreshCw, X, Clock, AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
-import { StatusBadge } from "../components/status-badge";
+
 import { EmptyState } from "../components/empty-state";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3100";
@@ -37,13 +37,15 @@ interface Consumer {
   status: string;
 }
 
-const statusIcon: Record<string, React.ReactNode> = {
-  pending: <Clock size={14} className="text-muted-foreground" />,
-  in_progress: <Loader2 size={14} className="animate-spin text-accent-blue" />,
-  completed: <CheckCircle2 size={14} className="text-accent-green" />,
-  failed: <AlertCircle size={14} className="text-accent-red" />,
-  cancelled: <X size={14} className="text-muted" />,
+const taskStatusDisplay: Record<string, { icon: React.ReactNode; label: string; color: string }> = {
+  pending:     { icon: <Clock size={14} />,                          label: "Pending",     color: "text-muted-foreground" },
+  in_progress: { icon: <Loader2 size={14} className="animate-spin" />, label: "Running",     color: "text-accent-blue" },
+  completed:   { icon: <CheckCircle2 size={14} />,                   label: "Completed",   color: "text-accent-green" },
+  failed:      { icon: <AlertCircle size={14} />,                    label: "Failed",      color: "text-accent-red" },
+  cancelled:   { icon: <X size={14} />,                              label: "Cancelled",   color: "text-muted" },
+  timeout:     { icon: <Clock size={14} />,                          label: "Timed Out",   color: "text-accent-yellow" },
 };
+const defaultStatus = { icon: <Clock size={14} />, label: "Unknown", color: "text-muted-foreground" };
 
 function formatDuration(start?: string, end?: string): string {
   if (!start) return "—";
@@ -269,9 +271,9 @@ export default function TasksPage() {
               {tasks.map((task) => (
                 <tr key={task.id} className="border-b border-border-subtle last:border-0 transition-colors hover:bg-surface-hover">
                   <td className="px-4 py-3">
-                    <div className="flex items-center gap-2">
-                      {statusIcon[task.status] ?? null}
-                      <StatusBadge status={task.status} />
+                    <div className={`flex items-center gap-1.5 text-xs font-medium ${(taskStatusDisplay[task.status] ?? defaultStatus).color}`}>
+                      {(taskStatusDisplay[task.status] ?? defaultStatus).icon}
+                      {(taskStatusDisplay[task.status] ?? defaultStatus).label}
                     </div>
                   </td>
                   <td className="px-4 py-3">

@@ -21,7 +21,7 @@ export interface SystemStatus {
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3100";
 
-export function useSystemStatus(intervalMs = 5000): { status: SystemStatus | null; error: string | null } {
+export function useSystemStatus(intervalMs = 5000, registryVersion = 0): { status: SystemStatus | null; error: string | null } {
   const [status, setStatus] = useState<SystemStatus | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -41,7 +41,7 @@ export function useSystemStatus(intervalMs = 5000): { status: SystemStatus | nul
     fetchStatus();
     const id = setInterval(fetchStatus, intervalMs);
     return () => clearInterval(id);
-  }, [fetchStatus, intervalMs]);
+  }, [fetchStatus, intervalMs, registryVersion]);
 
   return { status, error };
 }

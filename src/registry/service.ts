@@ -17,6 +17,7 @@ import type {
   ListAgentsFilter,
   Paginated,
 } from "./repository.js";
+import type { WsBroadcaster } from "../realtime/ws-broadcaster.js";
 
 function generateApiKey(): string {
   return `asc_${crypto.randomBytes(32).toString("hex")}`;
@@ -30,8 +31,17 @@ export class RegistryService {
   constructor(
     private providers: ProviderRepository,
     private consumers: ConsumerRepository,
-    private agents: AgentRepository
+    private agents: AgentRepository,
+    private broadcaster?: WsBroadcaster
   ) {}
+
+  private notifyRegistryChanged(): void {
+    this.broadcaster?.broadcast({
+      type: "registry_changed",
+      payload: {},
+      timestamp: new Date().toISOString(),
+    });
+  }
 
   // --- Providers ---
 
@@ -45,6 +55,7 @@ export class RegistryService {
       apiKeyHash: hashApiKey(apiKey),
       metadata: req.metadata ?? {},
     });
+    this.notifyRegistryChanged();
     return { provider, apiKey };
   }
 
@@ -57,11 +68,14 @@ export class RegistryService {
   }
 
   async updateProvider(id: ProviderId, input: UpdateProviderInput): Promise<ProviderOrg> {
-    return this.providers.update(id, input);
+    const result = await this.providers.update(id, input);
+    this.notifyRegistryChanged();
+    return result;
   }
 
   async deleteProvider(id: ProviderId): Promise<void> {
-    return this.providers.delete(id);
+    await this.providers.delete(id);
+    this.notifyRegistryChanged();
   }
 
   // --- Consumers ---
@@ -75,6 +89,7 @@ export class RegistryService {
       apiKeyHash: hashApiKey(apiKey),
       metadata: req.metadata ?? {},
     });
+    this.notifyRegistryChanged();
     return { consumer, apiKey };
   }
 
@@ -87,17 +102,20 @@ export class RegistryService {
   }
 
   async updateConsumer(id: ConsumerId, input: UpdateConsumerInput): Promise<ConsumerOrg> {
-    return this.consumers.update(id, input);
+    const result = await this.consumers.update(id, input);
+    this.notifyRegistryChanged();
+    return result;
   }
 
   async deleteConsumer(id: ConsumerId): Promise<void> {
-    return this.consumers.delete(id);
+    await this.consumers.delete(id);
+    this.notifyRegistryChanged();
   }
 
   // --- Agents ---
 
   async registerAgent(providerId: ProviderId, req: AgentRegistrationRequest): Promise<Agent> {
-    return this.agents.create({
+    const agent = await this.agents.create({
       providerId,
       name: req.name,
       description: req.description,
@@ -108,6 +126,8 @@ export class RegistryService {
       supportsStreaming: req.supportsStreaming,
       metadata: req.metadata ?? {},
     });
+    this.notifyRegistryChanged();
+    return agent;
   }
 
   async getAgent(id: AgentId): Promise<Agent | null> {
@@ -119,10 +139,13 @@ export class RegistryService {
   }
 
   async updateAgent(id: AgentId, input: UpdateAgentInput): Promise<Agent> {
-    return this.agents.update(id, input);
+    const result = await this.agents.update(id, input);
+    this.notifyRegistryChanged();
+    return result;
   }
 
   async deleteAgent(id: AgentId): Promise<void> {
-    return this.agents.delete(id);
+    await this.agents.delete(id);
+    this.notifyRegistryChanged();
   }
 }

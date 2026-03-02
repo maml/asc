@@ -100,11 +100,11 @@ export default function Dashboard() {
     const f = (url: string) => fetch(url).then((r) => r.json()).catch(() => null);
 
     Promise.all([
-      f(`${API_BASE}/api/providers?limit=1`),
-      f(`${API_BASE}/api/agents?limit=1`),
-      f(`${API_BASE}/api/consumers?limit=1`),
-      f(`${API_BASE}/api/tasks?status=in_progress&limit=1`),
-      f(`${API_BASE}/api/traces?limit=1`),
+      f(`${API_BASE}/api/providers?limit=100`),
+      f(`${API_BASE}/api/agents?limit=100`),
+      f(`${API_BASE}/api/consumers?limit=100`),
+      f(`${API_BASE}/api/tasks?status=in_progress&limit=100`),
+      f(`${API_BASE}/api/traces?limit=100`),
       f(`${API_BASE}/api/sla-compliance?limit=50`),
       f(`${API_BASE}/api/billing/mtd`),
     ]).then(([provRes, agentRes, consRes, taskRes, traceRes, slaRes, mtdRes]) => {

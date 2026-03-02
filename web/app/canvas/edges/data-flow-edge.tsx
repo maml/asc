@@ -50,9 +50,9 @@ function DataFlowEdgeInner(props: EdgeProps) {
       <BaseEdge
         path={edgePath}
         style={{
-          stroke: isActive ? color : "var(--border)",
-          strokeWidth: isActive ? 2 : 1,
-          opacity: isActive ? 0.8 : 0.4,
+          stroke: isActive ? color : "rgba(148, 163, 184, 0.6)",
+          strokeWidth: isActive ? 2 : 1.5,
+          opacity: isActive ? 0.9 : 1,
           transition: "stroke 300ms, opacity 300ms",
         }}
       />
