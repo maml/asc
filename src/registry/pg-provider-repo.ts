@@ -43,6 +43,12 @@ export class PgProviderRepository implements ProviderRepository {
     return rowToProvider(rows[0] as Record<string, unknown>);
   }
 
+  async findByApiKeyHash(hash: string): Promise<ProviderOrg | null> {
+    const { rows } = await this.pool.query("SELECT * FROM providers WHERE api_key_hash = $1", [hash]);
+    if (rows.length === 0) return null;
+    return rowToProvider(rows[0] as Record<string, unknown>);
+  }
+
   async list(pagination: PaginationRequest, status?: string): Promise<Paginated<ProviderOrg>> {
     const conditions: string[] = [];
     const params: unknown[] = [];

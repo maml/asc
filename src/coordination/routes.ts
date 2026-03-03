@@ -4,16 +4,22 @@ import type { FastifyInstance } from "fastify";
 import type { AgentId, ConsumerId, TaskId } from "../types/brand.js";
 import type { CoordinationRequest } from "../types/coordination.js";
 import { CoordinationService, ServiceError } from "./service.js";
+import { requireConsumer } from "../auth/guards.js";
 
 export function registerCoordinationRoutes(
   app: FastifyInstance,
   service: CoordinationService
 ): void {
-  // Submit a coordination request
+  // Submit a coordination request — consumer only, derive consumerId from identity
   app.post("/api/coordinations", async (req, reply) => {
-    const body = req.body as CoordinationRequest;
+    if (requireConsumer(req, reply)) return;
+    const body = req.body as Omit<CoordinationRequest, "consumerId"> & { consumerId?: string };
+    const request: CoordinationRequest = {
+      ...body,
+      consumerId: req.identity!.id as ConsumerId,
+    };
     try {
-      const task = await service.submit(body);
+      const task = await service.submit(request);
       return reply.status(202).send({ data: { coordinationId: task.coordinationId, task } });
     } catch (err) {
       if (err instanceof ServiceError) {

@@ -1,7 +1,6 @@
 // Registry service — business logic layer between API and repositories.
 // Handles API key generation/hashing and input validation.
 
-import crypto from "node:crypto";
 import type { ProviderId, AgentId, ConsumerId } from "../types/brand.js";
 import type { PaginationRequest } from "../types/common.js";
 import type { ProviderOrg, ProviderRegistrationRequest } from "../types/provider.js";
@@ -18,14 +17,7 @@ import type {
   Paginated,
 } from "./repository.js";
 import type { WsBroadcaster } from "../realtime/ws-broadcaster.js";
-
-function generateApiKey(): string {
-  return `asc_${crypto.randomBytes(32).toString("hex")}`;
-}
-
-function hashApiKey(key: string): string {
-  return crypto.createHash("sha256").update(key).digest("hex");
-}
+import { generateApiKey, hashApiKey } from "../auth/utils.js";
 
 export class RegistryService {
   constructor(

@@ -43,6 +43,12 @@ export class PgConsumerRepository implements ConsumerRepository {
     return rowToConsumer(rows[0] as Record<string, unknown>);
   }
 
+  async findByApiKeyHash(hash: string): Promise<ConsumerOrg | null> {
+    const { rows } = await this.pool.query("SELECT * FROM consumers WHERE api_key_hash = $1", [hash]);
+    if (rows.length === 0) return null;
+    return rowToConsumer(rows[0] as Record<string, unknown>);
+  }
+
   async list(pagination: PaginationRequest, status?: string): Promise<Paginated<ConsumerOrg>> {
     const conditions: string[] = [];
     const params: unknown[] = [];

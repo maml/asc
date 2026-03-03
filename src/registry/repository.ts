@@ -34,6 +34,7 @@ export interface UpdateProviderInput {
 export interface ProviderRepository {
   create(input: CreateProviderInput): Promise<ProviderOrg>;
   findById(id: ProviderId): Promise<ProviderOrg | null>;
+  findByApiKeyHash(hash: string): Promise<ProviderOrg | null>;
   list(pagination: PaginationRequest, status?: string): Promise<Paginated<ProviderOrg>>;
   update(id: ProviderId, input: UpdateProviderInput): Promise<ProviderOrg>;
   delete(id: ProviderId): Promise<void>;
@@ -61,6 +62,7 @@ export interface UpdateConsumerInput {
 export interface ConsumerRepository {
   create(input: CreateConsumerInput): Promise<ConsumerOrg>;
   findById(id: ConsumerId): Promise<ConsumerOrg | null>;
+  findByApiKeyHash(hash: string): Promise<ConsumerOrg | null>;
   list(pagination: PaginationRequest, status?: string): Promise<Paginated<ConsumerOrg>>;
   update(id: ConsumerId, input: UpdateConsumerInput): Promise<ConsumerOrg>;
   delete(id: ConsumerId): Promise<void>;
