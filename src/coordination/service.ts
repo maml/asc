@@ -18,6 +18,8 @@ interface ProviderLookup {
 }
 
 export class CoordinationService {
+  private pendingExecutions = new Set<Promise<void>>();
+
   constructor(
     private coordRepo: CoordinationRepository,
     private agentRepo: AgentRepository,
@@ -28,6 +30,11 @@ export class CoordinationService {
     private slaService?: SlaService,
     private billingService?: BillingService,
   ) {}
+
+  /** Wait for all in-flight fire-and-forget executions to settle */
+  async drain(): Promise<void> {
+    await Promise.allSettled(this.pendingExecutions);
+  }
 
   /** Submit a new coordination request. Creates the coordination + task, then starts execution. */
   async submit(request: CoordinationRequest): Promise<Task> {
@@ -65,9 +72,11 @@ export class CoordinationService {
     }, { agentId: request.agentId, consumerId: request.consumerId });
 
     // Execute asynchronously — don't block the response
-    this.executeTask(task, agent).catch((err) => {
-      console.error(`Unhandled error executing task ${task.id}:`, err);
+    const execution = this.executeTask(task, agent).catch(() => {
+      // Errors are already emitted as coordination events; no need to log here
     });
+    this.pendingExecutions.add(execution);
+    execution.finally(() => this.pendingExecutions.delete(execution));
 
     return task;
   }
