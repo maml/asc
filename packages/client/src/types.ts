@@ -442,3 +442,10 @@ export interface PipelineStepExecution {
   completedAt?: Timestamp;
   durationMs?: number;
 }
+
+export interface PipelineEvent {
+  executionId: PipelineExecutionId;
+  traceId: TraceId;
+  payload: Record<string, unknown>;
+  timestamp: Timestamp;
+}

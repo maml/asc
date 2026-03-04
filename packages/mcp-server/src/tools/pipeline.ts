@@ -165,18 +165,44 @@ export function register(server: McpServer, clients: Clients): void {
     async (params) => {
       try {
         if (!clients.consumer) return formatError(new Error("Consumer credentials required"));
-        // Not in SDK — direct HTTP call
-        const res = await fetch(
-          `${clients.baseUrl}/api/pipelines/${params.pipelineId}/executions`,
-          {
-            headers: {
-              Authorization: `Bearer ${process.env["ASC_CONSUMER_API_KEY"]}`,
-            },
-          }
-        );
-        const body = (await res.json()) as { data?: unknown; error?: { message: string } };
-        if (!res.ok) throw new Error(body.error?.message ?? `HTTP ${res.status}`);
-        return formatResult(body.data);
+        const result = await clients.consumer.listPipelineExecutions(params.pipelineId);
+        return formatResult(result);
+      } catch (err) {
+        return formatError(err);
+      }
+    }
+  );
+
+  // --- List Pipeline Events ---
+  server.tool(
+    "asc_pipeline_list_events",
+    "List all events for a pipeline execution (chronological)",
+    {
+      executionId: z.string().describe("Pipeline execution ID"),
+    },
+    async (params) => {
+      try {
+        if (!clients.consumer) return formatError(new Error("Consumer credentials required"));
+        const result = await clients.consumer.listPipelineEvents(params.executionId);
+        return formatResult(result);
+      } catch (err) {
+        return formatError(err);
+      }
+    }
+  );
+
+  // --- List Pipeline Steps ---
+  server.tool(
+    "asc_pipeline_list_steps",
+    "List all step executions for a pipeline execution",
+    {
+      executionId: z.string().describe("Pipeline execution ID"),
+    },
+    async (params) => {
+      try {
+        if (!clients.consumer) return formatError(new Error("Consumer credentials required"));
+        const result = await clients.consumer.listPipelineSteps(params.executionId);
+        return formatResult(result);
       } catch (err) {
         return formatError(err);
       }

@@ -14,6 +14,8 @@ import type {
   PaginationResponse,
   Pipeline,
   PipelineExecution,
+  PipelineStepExecution,
+  PipelineEvent,
   PipelineStepDef,
   RegisteredKey,
   KeyPathInfo,
@@ -238,6 +240,18 @@ export class AscConsumer extends BaseClient {
 
   async getPipelineExecution(id: PipelineExecutionId | string): Promise<PipelineExecution> {
     return this.request("GET", `/api/pipeline-executions/${id}`);
+  }
+
+  async listPipelineExecutions(pipelineId: PipelineId | string): Promise<{ executions: PipelineExecution[] }> {
+    return this.request("GET", `/api/pipelines/${pipelineId}/executions`);
+  }
+
+  async listPipelineEvents(executionId: PipelineExecutionId | string): Promise<{ events: PipelineEvent[] }> {
+    return this.request("GET", `/api/pipeline-executions/${executionId}/events`);
+  }
+
+  async listPipelineSteps(executionId: PipelineExecutionId | string): Promise<{ steps: PipelineStepExecution[] }> {
+    return this.request("GET", `/api/pipeline-executions/${executionId}/steps`);
   }
 
   async waitForPipeline(

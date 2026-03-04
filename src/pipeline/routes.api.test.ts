@@ -285,4 +285,87 @@ describe("Pipeline API routes", () => {
 
     expect(execRes.statusCode).toBe(403);
   });
+
+  // ─── GET /api/pipeline-executions/:id/steps ───
+
+  it("GET /api/pipeline-executions/:id/steps returns step executions", async () => {
+    const provider = await createTestProvider(pool);
+    const consumer = await createTestConsumer(pool);
+    const agent1 = await createTestAgent(pool, provider.id, { status: "active" });
+    const agent2 = await createTestAgent(pool, provider.id, { status: "active" });
+
+    const createRes = await app.inject({
+      method: "POST",
+      url: "/api/pipelines",
+      headers: authHeader(consumer.apiKey),
+      payload: {
+        name: "steps-pipeline",
+        steps: [
+          { name: "step1", agentId: agent1.id },
+          { name: "step2", agentId: agent2.id },
+        ],
+      },
+    });
+    const { data: created } = JSON.parse(createRes.body);
+
+    const execRes = await app.inject({
+      method: "POST",
+      url: `/api/pipelines/${created.id}/execute`,
+      headers: authHeader(consumer.apiKey),
+      payload: { input: { text: "hi" } },
+    });
+    const { data: execution } = JSON.parse(execRes.body);
+
+    const stepsRes = await app.inject({
+      method: "GET",
+      url: `/api/pipeline-executions/${execution.id}/steps`,
+      headers: authHeader(consumer.apiKey),
+    });
+
+    expect(stepsRes.statusCode).toBe(200);
+    const body = JSON.parse(stepsRes.body);
+    expect(body.data.steps).toHaveLength(2);
+    expect(body.data.steps[0].stepName).toBe("step1");
+    expect(body.data.steps[1].stepName).toBe("step2");
+  });
+
+  // ─── GET /api/pipeline-executions/:id/events ───
+
+  it("GET /api/pipeline-executions/:id/events returns events", async () => {
+    const provider = await createTestProvider(pool);
+    const consumer = await createTestConsumer(pool);
+    const agent = await createTestAgent(pool, provider.id, { status: "active" });
+
+    const createRes = await app.inject({
+      method: "POST",
+      url: "/api/pipelines",
+      headers: authHeader(consumer.apiKey),
+      payload: {
+        name: "events-pipeline",
+        steps: [{ name: "step1", agentId: agent.id }],
+      },
+    });
+    const { data: created } = JSON.parse(createRes.body);
+
+    const execRes = await app.inject({
+      method: "POST",
+      url: `/api/pipelines/${created.id}/execute`,
+      headers: authHeader(consumer.apiKey),
+      payload: { input: { text: "hi" } },
+    });
+    const { data: execution } = JSON.parse(execRes.body);
+
+    // Wait briefly for the fire-and-forget to emit at least the started event
+    await new Promise((r) => setTimeout(r, 200));
+
+    const eventsRes = await app.inject({
+      method: "GET",
+      url: `/api/pipeline-executions/${execution.id}/events`,
+      headers: authHeader(consumer.apiKey),
+    });
+
+    expect(eventsRes.statusCode).toBe(200);
+    const body = JSON.parse(eventsRes.body);
+    expect(Array.isArray(body.data.events)).toBe(true);
+  });
 });

@@ -59,6 +59,15 @@ const mockConsumer = {
     status: "completed",
     output: { result: "done" },
   }),
+  listPipelineExecutions: vi.fn().mockResolvedValue({
+    executions: [{ id: "pex_1", status: "completed" }],
+  }),
+  listPipelineEvents: vi.fn().mockResolvedValue({
+    events: [{ executionId: "pex_1", payload: { type: "pipeline_started" }, timestamp: "2026-01-01T00:00:00Z" }],
+  }),
+  listPipelineSteps: vi.fn().mockResolvedValue({
+    steps: [{ stepIndex: 0, stepName: "step1", status: "completed" }],
+  }),
 };
 
 function makeClients(withConsumer = true): Clients {
@@ -76,8 +85,8 @@ describe("pipeline tools", () => {
     register(mockServer as never, makeClients());
   });
 
-  it("registers all 8 pipeline tools", () => {
-    expect(mockServer.tool).toHaveBeenCalledTimes(8);
+  it("registers all 10 pipeline tools", () => {
+    expect(mockServer.tool).toHaveBeenCalledTimes(10);
     expect(tools.has("asc_pipeline_create")).toBe(true);
     expect(tools.has("asc_pipeline_get")).toBe(true);
     expect(tools.has("asc_pipeline_list")).toBe(true);
@@ -86,6 +95,8 @@ describe("pipeline tools", () => {
     expect(tools.has("asc_pipeline_execute_and_wait")).toBe(true);
     expect(tools.has("asc_pipeline_get_execution")).toBe(true);
     expect(tools.has("asc_pipeline_list_executions")).toBe(true);
+    expect(tools.has("asc_pipeline_list_events")).toBe(true);
+    expect(tools.has("asc_pipeline_list_steps")).toBe(true);
   });
 
   // --- asc_pipeline_create ---
@@ -252,65 +263,66 @@ describe("pipeline tools", () => {
     });
   });
 
-  // --- asc_pipeline_list_executions ---
+  // --- asc_pipeline_list_executions (refactored to use SDK) ---
   describe("asc_pipeline_list_executions", () => {
-    const originalFetch = globalThis.fetch;
-    let savedKey: string | undefined;
-
-    beforeEach(() => {
-      savedKey = process.env["ASC_CONSUMER_API_KEY"];
-      process.env["ASC_CONSUMER_API_KEY"] = "asc_test_key_123";
-    });
-
-    afterEach(() => {
-      globalThis.fetch = originalFetch;
-      if (savedKey !== undefined) {
-        process.env["ASC_CONSUMER_API_KEY"] = savedKey;
-      } else {
-        delete process.env["ASC_CONSUMER_API_KEY"];
-      }
-    });
-
-    it("fetches /api/pipelines/:id/executions with auth header", async () => {
-      const executions = [
-        { id: "pex_1", status: "completed" },
-        { id: "pex_2", status: "pending" },
-      ];
-      globalThis.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => ({ data: executions }),
-      }) as unknown as typeof fetch;
-
+    it("calls consumer.listPipelineExecutions with pipelineId", async () => {
       const handler = tools.get("asc_pipeline_list_executions")!;
       const result = await handler({ pipelineId: "pip_1" });
-
-      expect(globalThis.fetch).toHaveBeenCalledWith(
-        "http://localhost:3100/api/pipelines/pip_1/executions",
-        {
-          headers: {
-            Authorization: "Bearer asc_test_key_123",
-          },
-        },
-      );
+      expect(mockConsumer.listPipelineExecutions).toHaveBeenCalledWith("pip_1");
       expect(result).toEqual({
-        content: [{ type: "text", text: JSON.stringify(executions, null, 2) }],
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify(
+              { executions: [{ id: "pex_1", status: "completed" }] },
+              null,
+              2,
+            ),
+          },
+        ],
       });
     });
+  });
 
-    it("returns error when fetch fails", async () => {
-      globalThis.fetch = vi.fn().mockResolvedValue({
-        ok: false,
-        status: 500,
-        json: async () => ({ error: { message: "Internal server error" } }),
-      }) as unknown as typeof fetch;
+  // --- asc_pipeline_list_events ---
+  describe("asc_pipeline_list_events", () => {
+    it("calls consumer.listPipelineEvents with executionId", async () => {
+      const handler = tools.get("asc_pipeline_list_events")!;
+      const result = await handler({ executionId: "pex_1" });
+      expect(mockConsumer.listPipelineEvents).toHaveBeenCalledWith("pex_1");
+      expect(result).toEqual({
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify(
+              { events: [{ executionId: "pex_1", payload: { type: "pipeline_started" }, timestamp: "2026-01-01T00:00:00Z" }] },
+              null,
+              2,
+            ),
+          },
+        ],
+      });
+    });
+  });
 
-      const handler = tools.get("asc_pipeline_list_executions")!;
-      const result = (await handler({ pipelineId: "pip_1" })) as {
-        content: Array<{ text: string }>;
-        isError?: boolean;
-      };
-      expect(result.isError).toBe(true);
-      expect(result.content[0].text).toContain("Internal server error");
+  // --- asc_pipeline_list_steps ---
+  describe("asc_pipeline_list_steps", () => {
+    it("calls consumer.listPipelineSteps with executionId", async () => {
+      const handler = tools.get("asc_pipeline_list_steps")!;
+      const result = await handler({ executionId: "pex_1" });
+      expect(mockConsumer.listPipelineSteps).toHaveBeenCalledWith("pex_1");
+      expect(result).toEqual({
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify(
+              { steps: [{ stepIndex: 0, stepName: "step1", status: "completed" }] },
+              null,
+              2,
+            ),
+          },
+        ],
+      });
     });
   });
 
@@ -329,6 +341,8 @@ describe("pipeline tools", () => {
         "asc_pipeline_execute_and_wait",
         "asc_pipeline_get_execution",
         "asc_pipeline_list_executions",
+        "asc_pipeline_list_events",
+        "asc_pipeline_list_steps",
       ]) {
         const handler = tools.get(toolName)!;
         const result = (await handler({ pipelineId: "pip_1" })) as {

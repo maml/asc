@@ -286,6 +286,39 @@ describe("AscConsumer", () => {
     expect(result).toEqual(mockExec);
   });
 
+  it("listPipelineExecutions sends GET /api/pipelines/:id/executions", async () => {
+    globalThis.fetch = mockFetch(
+      200,
+      { data: { executions: [{ id: "exec_1", status: "completed" }] } },
+      "GET",
+      "/api/pipelines/pipe_1/executions",
+    );
+    const result = await consumer.listPipelineExecutions("pipe_1");
+    expect(result.executions).toHaveLength(1);
+  });
+
+  it("listPipelineEvents sends GET /api/pipeline-executions/:id/events", async () => {
+    globalThis.fetch = mockFetch(
+      200,
+      { data: { events: [{ executionId: "exec_1", payload: { type: "pipeline_started" } }] } },
+      "GET",
+      "/api/pipeline-executions/exec_1/events",
+    );
+    const result = await consumer.listPipelineEvents("exec_1");
+    expect(result.events).toHaveLength(1);
+  });
+
+  it("listPipelineSteps sends GET /api/pipeline-executions/:id/steps", async () => {
+    globalThis.fetch = mockFetch(
+      200,
+      { data: { steps: [{ stepIndex: 0, stepName: "step1", status: "completed" }] } },
+      "GET",
+      "/api/pipeline-executions/exec_1/steps",
+    );
+    const result = await consumer.listPipelineSteps("exec_1");
+    expect(result.steps).toHaveLength(1);
+  });
+
   it("waitForPipeline polls until completed", async () => {
     let callCount = 0;
     globalThis.fetch = vi.fn(async () => {

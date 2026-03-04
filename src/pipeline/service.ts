@@ -73,6 +73,10 @@ export class PipelineService {
     return this.repo.listEvents(executionId);
   }
 
+  async listStepExecutions(executionId: PipelineExecutionId) {
+    return this.repo.listStepExecutions(executionId);
+  }
+
   async execute(pipelineId: PipelineId, consumerId: ConsumerId, input: unknown, metadata?: Record<string, string>) {
     const pipeline = await this.repo.getPipeline(pipelineId);
     if (!pipeline) throw new ServiceError("PIPELINE_NOT_FOUND", `Pipeline ${pipelineId} not found`);

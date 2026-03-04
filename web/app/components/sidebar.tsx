@@ -18,6 +18,7 @@ import {
   ChevronRight,
   Zap,
   LayoutDashboard,
+  Workflow,
 } from "lucide-react";
 
 interface NavItem {
@@ -50,6 +51,7 @@ const navigation: NavGroup[] = [
     title: "Coordination",
     items: [
       { label: "Tasks", href: "/tasks", icon: ListTodo },
+      { label: "Pipelines", href: "/pipelines", icon: Workflow },
       { label: "Events", href: "/events", icon: Activity },
     ],
   },

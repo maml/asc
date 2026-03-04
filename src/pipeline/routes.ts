@@ -121,4 +121,11 @@ export function registerPipelineRoutes(
     const events = await service.listEvents(id as PipelineExecutionId);
     return { data: { events } };
   });
+
+  // List step executions for an execution
+  app.get("/api/pipeline-executions/:id/steps", async (req, reply) => {
+    const { id } = req.params as { id: string };
+    const steps = await service.listStepExecutions(id as PipelineExecutionId);
+    return { data: { steps } };
+  });
 }
