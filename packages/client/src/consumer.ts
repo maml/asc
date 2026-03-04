@@ -1,0 +1,188 @@
+import { BaseClient, unauthenticatedPost } from "./base.js";
+import { AscTimeoutError } from "./errors.js";
+import type { ConsumerId, AgentId, CoordinationId, TaskId } from "./types.js";
+import type {
+  ConsumerOrg,
+  ConsumerRegistrationRequest,
+  ConsumerRegistrationResponse,
+  ProviderOrg,
+  Agent,
+  Task,
+  CoordinationEvent,
+  BillingEvent,
+  Trace,
+  PaginationResponse,
+} from "./types.js";
+
+export interface AscConsumerOptions {
+  baseUrl: string;
+  apiKey: string;
+  consumerId: ConsumerId;
+}
+
+export class AscConsumer extends BaseClient {
+  readonly consumerId: ConsumerId;
+
+  constructor(opts: AscConsumerOptions) {
+    super(opts.baseUrl, opts.apiKey);
+    this.consumerId = opts.consumerId;
+  }
+
+  // --- Self management ---
+
+  async getProfile(): Promise<ConsumerOrg> {
+    return this.request("GET", `/api/consumers/${this.consumerId}`);
+  }
+
+  async update(fields: Partial<ConsumerOrg>): Promise<ConsumerOrg> {
+    return this.request("PATCH", `/api/consumers/${this.consumerId}`, fields);
+  }
+
+  async delete(): Promise<void> {
+    return this.request("DELETE", `/api/consumers/${this.consumerId}`);
+  }
+
+  // --- Coordination ---
+
+  async submit(body: {
+    agentId: AgentId | string;
+    input: unknown;
+    priority?: string;
+    callbackUrl?: string;
+    timeoutMs?: number;
+    metadata?: Record<string, string>;
+  }): Promise<{ coordinationId: string; task: Task }> {
+    return this.request("POST", "/api/coordinations", body);
+  }
+
+  async getTask(taskId: TaskId | string): Promise<Task> {
+    return this.request("GET", `/api/tasks/${taskId}`);
+  }
+
+  async listTasks(
+    opts?: { cursor?: string; limit?: number; agentId?: string; status?: string },
+  ): Promise<{ tasks: Task[]; pagination: PaginationResponse }> {
+    const params = new URLSearchParams();
+    if (opts?.cursor) params.set("cursor", opts.cursor);
+    if (opts?.limit) params.set("limit", String(opts.limit));
+    if (opts?.agentId) params.set("agentId", opts.agentId);
+    if (opts?.status) params.set("status", opts.status);
+    return this.request("GET", `/api/tasks?${params}`);
+  }
+
+  async waitForCompletion(
+    taskId: TaskId | string,
+    opts?: { timeoutMs?: number; intervalMs?: number },
+  ): Promise<Task> {
+    const timeoutMs = opts?.timeoutMs ?? 30_000;
+    const intervalMs = opts?.intervalMs ?? 500;
+    const deadline = Date.now() + timeoutMs;
+
+    while (Date.now() < deadline) {
+      const task = await this.getTask(taskId);
+      if (task.status === "completed" || task.status === "failed") {
+        return task;
+      }
+      await new Promise((resolve) => setTimeout(resolve, intervalMs));
+    }
+
+    throw new AscTimeoutError(taskId, timeoutMs);
+  }
+
+  async listEvents(
+    coordinationId: CoordinationId | string,
+    opts?: { cursor?: string; limit?: number },
+  ): Promise<{ events: CoordinationEvent[]; pagination: PaginationResponse }> {
+    const params = new URLSearchParams();
+    if (opts?.cursor) params.set("cursor", opts.cursor);
+    if (opts?.limit) params.set("limit", String(opts.limit));
+    return this.request("GET", `/api/coordinations/${coordinationId}/events?${params}`);
+  }
+
+  // --- Discovery ---
+
+  async listAgents(
+    opts?: { cursor?: string; limit?: number; providerId?: string; status?: string; capability?: string },
+  ): Promise<{ agents: Agent[]; pagination: PaginationResponse }> {
+    const params = new URLSearchParams();
+    if (opts?.cursor) params.set("cursor", opts.cursor);
+    if (opts?.limit) params.set("limit", String(opts.limit));
+    if (opts?.providerId) params.set("providerId", opts.providerId);
+    if (opts?.status) params.set("status", opts.status);
+    if (opts?.capability) params.set("capability", opts.capability);
+    return this.request("GET", `/api/agents?${params}`);
+  }
+
+  async getAgent(agentId: AgentId | string): Promise<Agent> {
+    return this.request("GET", `/api/agents/${agentId}`);
+  }
+
+  async listProviders(
+    opts?: { cursor?: string; limit?: number; status?: string },
+  ): Promise<{ providers: ProviderOrg[]; pagination: PaginationResponse }> {
+    const params = new URLSearchParams();
+    if (opts?.cursor) params.set("cursor", opts.cursor);
+    if (opts?.limit) params.set("limit", String(opts.limit));
+    if (opts?.status) params.set("status", opts.status);
+    return this.request("GET", `/api/providers?${params}`);
+  }
+
+  // --- Billing ---
+
+  async listBillingEvents(
+    opts?: { agentId?: string; limit?: number },
+  ): Promise<BillingEvent[]> {
+    const params = new URLSearchParams();
+    if (opts?.agentId) params.set("agentId", opts.agentId);
+    if (opts?.limit) params.set("limit", String(opts.limit));
+    const res = await this.request<{ events: BillingEvent[] }>(
+      "GET",
+      `/api/billing-events?${params}`,
+    );
+    return res.events;
+  }
+
+  async getUsageSummary(opts: {
+    periodStart: string;
+    periodEnd: string;
+    agentId?: string;
+  }): Promise<Record<string, unknown>> {
+    const params = new URLSearchParams();
+    params.set("periodStart", opts.periodStart);
+    params.set("periodEnd", opts.periodEnd);
+    if (opts.agentId) params.set("agentId", opts.agentId);
+    const res = await this.request<{ summary: Record<string, unknown> }>(
+      "GET",
+      `/api/billing/usage?${params}`,
+    );
+    return res.summary;
+  }
+
+  async getMonthToDateSpend(): Promise<{ totalCents: number; currency: string }> {
+    return this.request("GET", "/api/billing/mtd");
+  }
+
+  // --- Observability: Traces ---
+
+  async listTraces(
+    opts?: { limit?: number; offset?: string },
+  ): Promise<{ traces: Trace[]; hasMore: boolean }> {
+    const params = new URLSearchParams();
+    if (opts?.limit) params.set("limit", String(opts.limit));
+    if (opts?.offset) params.set("offset", opts.offset);
+    return this.request("GET", `/api/traces?${params}`);
+  }
+
+  async getTrace(traceId: string): Promise<Trace> {
+    const res = await this.request<{ trace: Trace }>("GET", `/api/traces/${traceId}`);
+    return res.trace;
+  }
+}
+
+// Standalone registration (no auth required)
+export async function registerConsumer(
+  baseUrl: string,
+  body: ConsumerRegistrationRequest,
+): Promise<ConsumerRegistrationResponse> {
+  return unauthenticatedPost<ConsumerRegistrationResponse>(baseUrl, "/api/consumers", body);
+}

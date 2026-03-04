@@ -3,15 +3,24 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "workspaces": ["packages/*"],
   "directories": {
     "doc": "docs"
   },
   "scripts": {
+    "build:client": "cd packages/client && tsc",
+    "test:client": "cd packages/client && vitest run",
     "dev": "tsx src/server.ts",
     "agents": "tsx src/simulated/start-agents.ts",
     "migrate": "tsx src/db/migrate.ts",
     "build": "tsc",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "demo:docs": "tsx demos/doc-processing/run.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:unit": "vitest run '.unit.test.ts'",
+    "test:repo": "vitest run '.repo.test.ts'",
+    "test:api": "vitest run '.api.test.ts'"
   },
   "keywords": [],
   "author": "",
@@ -21,7 +30,8 @@
     "@types/pg": "^8.16.0",
     "@types/ws": "^8.18.1",
     "tsx": "^4.21.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.18"
   },
   "dependencies": {
     "@fastify/cors": "^11.2.0",
