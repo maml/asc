@@ -98,6 +98,10 @@ export interface ListAgentsFilter {
   providerId?: ProviderId;
   status?: string;
   capability?: string;
+  search?: string;
+  pricingType?: string;
+  sort?: "name" | "created_at" | "price";
+  sortDir?: "asc" | "desc";
 }
 
 export interface AgentRepository {

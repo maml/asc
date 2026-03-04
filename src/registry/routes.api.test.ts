@@ -300,4 +300,147 @@ describe("Registry API", () => {
     });
     expect(getRes.statusCode).toBe(404);
   });
+
+  // --- Marketplace: Search, Filter, Sort ---
+
+  it("GET /api/agents?search= filters by name ILIKE", async () => {
+    const { providerApiKey } = await createAgent(app, { name: "DocAnalyzer", description: "Analyzes things" });
+    await createAgent(app, { name: "ChatBot", description: "Chats with users" });
+
+    const res = await app.inject({
+      method: "GET",
+      url: "/api/agents?search=docana",
+      headers: { authorization: `Bearer ${providerApiKey}` },
+    });
+
+    expect(res.statusCode).toBe(200);
+    const { data } = res.json();
+    expect(data.agents).toHaveLength(1);
+    expect(data.agents[0].name).toBe("DocAnalyzer");
+  });
+
+  it("GET /api/agents?search= filters by description ILIKE", async () => {
+    const { providerApiKey } = await createAgent(app, { name: "Agent1", description: "Processes legal documents" });
+    await createAgent(app, { name: "Agent2", description: "Generates images" });
+
+    const res = await app.inject({
+      method: "GET",
+      url: "/api/agents?search=legal",
+      headers: { authorization: `Bearer ${providerApiKey}` },
+    });
+
+    expect(res.statusCode).toBe(200);
+    const { data } = res.json();
+    expect(data.agents).toHaveLength(1);
+    expect(data.agents[0].name).toBe("Agent1");
+  });
+
+  it("GET /api/agents?pricingType= filters by pricing type", async () => {
+    const { providerApiKey } = await createAgent(app, {
+      name: "TokenAgent",
+      pricing: { type: "per_token", inputPricePerToken: { amountCents: 1, currency: "USD" }, outputPricePerToken: { amountCents: 2, currency: "USD" } },
+    });
+    await createAgent(app, { name: "CallAgent" }); // default is per_call from agentBody
+
+    const res = await app.inject({
+      method: "GET",
+      url: "/api/agents?pricingType=per_token",
+      headers: { authorization: `Bearer ${providerApiKey}` },
+    });
+
+    expect(res.statusCode).toBe(200);
+    const { data } = res.json();
+    expect(data.agents).toHaveLength(1);
+    expect(data.agents[0].name).toBe("TokenAgent");
+  });
+
+  it("GET /api/agents?sort=name&sortDir=asc returns alphabetical order", async () => {
+    const { providerApiKey } = await createAgent(app, { name: "Zebra" });
+    await createAgent(app, { name: "Alpha" });
+
+    const res = await app.inject({
+      method: "GET",
+      url: "/api/agents?sort=name&sortDir=asc",
+      headers: { authorization: `Bearer ${providerApiKey}` },
+    });
+
+    expect(res.statusCode).toBe(200);
+    const { data } = res.json();
+    expect(data.agents).toHaveLength(2);
+    expect(data.agents[0].name).toBe("Alpha");
+    expect(data.agents[1].name).toBe("Zebra");
+  });
+
+  it("GET /api/agents?sort=created_at&sortDir=desc returns newest first", async () => {
+    const { providerApiKey } = await createAgent(app, { name: "First" });
+    await createAgent(app, { name: "Second" });
+
+    const res = await app.inject({
+      method: "GET",
+      url: "/api/agents?sort=created_at&sortDir=desc",
+      headers: { authorization: `Bearer ${providerApiKey}` },
+    });
+
+    expect(res.statusCode).toBe(200);
+    const { data } = res.json();
+    expect(data.agents).toHaveLength(2);
+    expect(data.agents[0].name).toBe("Second");
+    expect(data.agents[1].name).toBe("First");
+  });
+
+  it("GET /api/agents combines search + status filter", async () => {
+    const { agentId, providerApiKey } = await createAgent(app, { name: "DocAgent" });
+    // Activate the agent
+    await app.inject({
+      method: "PATCH",
+      url: `/api/agents/${agentId}`,
+      payload: { status: "active" },
+      headers: { authorization: `Bearer ${providerApiKey}` },
+    });
+    await createAgent(app, { name: "DocBot" }); // stays draft
+
+    const res = await app.inject({
+      method: "GET",
+      url: "/api/agents?search=doc&status=active",
+      headers: { authorization: `Bearer ${providerApiKey}` },
+    });
+
+    expect(res.statusCode).toBe(200);
+    const { data } = res.json();
+    expect(data.agents).toHaveLength(1);
+    expect(data.agents[0].name).toBe("DocAgent");
+    expect(data.agents[0].status).toBe("active");
+  });
+
+  // --- Agent Stats ---
+
+  it("GET /api/agents/:id/stats returns stats for an agent", async () => {
+    const { agentId, providerApiKey } = await createAgent(app);
+
+    const res = await app.inject({
+      method: "GET",
+      url: `/api/agents/${agentId}/stats`,
+      headers: { authorization: `Bearer ${providerApiKey}` },
+    });
+
+    expect(res.statusCode).toBe(200);
+    const { data } = res.json();
+    expect(data.totalInvocations).toBe(0);
+    expect(data.successRate).toBe(0);
+    expect(data.avgLatencyMs).toBe(0);
+    expect(data.last30Days).toEqual({ invocations: 0, revenue: 0 });
+  });
+
+  it("GET /api/agents/:id/stats returns 404 for missing agent", async () => {
+    const { providerApiKey } = await createAgent(app);
+
+    const res = await app.inject({
+      method: "GET",
+      url: "/api/agents/00000000-0000-0000-0000-000000000000/stats",
+      headers: { authorization: `Bearer ${providerApiKey}` },
+    });
+
+    expect(res.statusCode).toBe(404);
+    expect(res.json().error.code).toBe("NOT_FOUND");
+  });
 });

@@ -115,7 +115,7 @@ export async function buildApp(pool: pg.Pool): Promise<AppContext> {
   app.addHook("preHandler", buildSignatureAuthHook(cryptoKeyRepo, providers, consumers));
 
   // Register all routes
-  registerRoutes(app, registryService);
+  registerRoutes(app, registryService, pool);
   registerCoordinationRoutes(app, coordService);
   registerObservabilityRoutes(app, traceService, slaService, qualityService);
   registerBillingRoutes(app, billingService);

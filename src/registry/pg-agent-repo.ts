@@ -69,6 +69,15 @@ export class PgAgentRepository implements AgentRepository {
       conditions.push(`capabilities @> $${idx++}::jsonb`);
       params.push(JSON.stringify([{ name: filter.capability }]));
     }
+    if (filter?.search) {
+      conditions.push(`(name ILIKE $${idx} OR description ILIKE $${idx})`);
+      params.push(`%${filter.search}%`);
+      idx++;
+    }
+    if (filter?.pricingType) {
+      conditions.push(`pricing->>'type' = $${idx++}`);
+      params.push(filter.pricingType);
+    }
     if (pagination.cursor) {
       conditions.push(`id > $${idx++}`);
       params.push(pagination.cursor);
@@ -77,8 +86,19 @@ export class PgAgentRepository implements AgentRepository {
     const where = conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
     params.push(pagination.limit + 1);
 
+    // Dynamic sort
+    const sortField = filter?.sort ?? "id";
+    const sortDir = filter?.sortDir === "desc" ? "DESC" : "ASC";
+    let orderCol: string;
+    switch (sortField) {
+      case "name": orderCol = "name"; break;
+      case "created_at": orderCol = "created_at"; break;
+      case "price": orderCol = "(pricing->>'pricePerCall')::text"; break;
+      default: orderCol = "id";
+    }
+
     const { rows } = await this.pool.query(
-      `SELECT * FROM agents ${where} ORDER BY id ASC LIMIT $${idx}`,
+      `SELECT * FROM agents ${where} ORDER BY ${orderCol} ${sortDir}, id ASC LIMIT $${idx}`,
       params
     );
 

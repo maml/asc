@@ -42,7 +42,7 @@ const navigation: NavGroup[] = [
     title: "Registry",
     items: [
       { label: "Providers", href: "/providers", icon: Building2 },
-      { label: "Agents", href: "/agents", icon: Bot },
+      { label: "Marketplace", href: "/agents", icon: Bot },
       { label: "Consumers", href: "/consumers", icon: Users },
     ],
   },

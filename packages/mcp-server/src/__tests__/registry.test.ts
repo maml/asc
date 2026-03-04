@@ -42,6 +42,7 @@ function makeClients(overrides: Partial<Clients> = {}): Clients {
       consumerId: "con_test" as any,
       listProviders: vi.fn(),
       getAgent: vi.fn(),
+      getAgentStats: vi.fn(),
       listAgents: vi.fn(),
     } as any,
     provider: {
@@ -51,6 +52,7 @@ function makeClients(overrides: Partial<Clients> = {}): Clients {
       listConsumers: vi.fn(),
       registerAgent: vi.fn(),
       getAgent: vi.fn(),
+      getAgentStats: vi.fn(),
       listAgents: vi.fn(),
       updateAgent: vi.fn(),
       deleteAgent: vi.fn(),
@@ -71,11 +73,11 @@ describe("registry tools", () => {
     vi.restoreAllMocks();
   });
 
-  it("registers all 11 tools", () => {
+  it("registers all 12 tools", () => {
     const clients = makeClients();
     register(mockServer as any, clients);
-    expect(mockServer.tool).toHaveBeenCalledTimes(11);
-    expect(tools.size).toBe(11);
+    expect(mockServer.tool).toHaveBeenCalledTimes(12);
+    expect(tools.size).toBe(12);
   });
 
   // ---- 1. asc_registry_register_provider ----
@@ -398,6 +400,74 @@ describe("registry tools", () => {
 
       const handler = tools.get("asc_registry_list_agents")!;
       const result: any = await handler({});
+
+      expect(result.isError).toBe(true);
+      expect(result.content[0].text).toContain("No credentials configured");
+    });
+  });
+
+  // ---- 9b. asc_registry_list_agents (marketplace params) ----
+  describe("asc_registry_list_agents marketplace params", () => {
+    it("passes search, pricingType, sort, sortDir to consumer.listAgents", async () => {
+      const clients = makeClients();
+      const agents = [{ id: "agt_1", name: "DocAgent" }];
+      (clients.consumer!.listAgents as ReturnType<typeof vi.fn>).mockResolvedValue(agents);
+
+      register(mockServer as any, clients);
+      const handler = tools.get("asc_registry_list_agents")!;
+      const result = await handler({
+        search: "doc",
+        pricingType: "per_invocation",
+        sort: "name",
+        sortDir: "asc",
+        status: "active",
+      });
+
+      expect(clients.consumer!.listAgents).toHaveBeenCalledWith({
+        search: "doc",
+        pricingType: "per_invocation",
+        sort: "name",
+        sortDir: "asc",
+        status: "active",
+      });
+      expect(parseResult(result)).toEqual(agents);
+    });
+  });
+
+  // ---- 9c. asc_registry_get_agent_stats ----
+  describe("asc_registry_get_agent_stats", () => {
+    it("prefers consumer.getAgentStats when consumer is available", async () => {
+      const clients = makeClients();
+      const stats = { totalInvocations: 42, successRate: 0.95, avgLatencyMs: 200, last30Days: { invocations: 10, revenue: 500 } };
+      (clients.consumer!.getAgentStats as ReturnType<typeof vi.fn>).mockResolvedValue(stats);
+
+      register(mockServer as any, clients);
+      const handler = tools.get("asc_registry_get_agent_stats")!;
+      const result = await handler({ agentId: "agt_1" });
+
+      expect(clients.consumer!.getAgentStats).toHaveBeenCalledWith("agt_1");
+      expect(parseResult(result)).toEqual(stats);
+    });
+
+    it("falls back to provider.getAgentStats when no consumer", async () => {
+      const clients = makeClients({ consumer: null });
+      const stats = { totalInvocations: 10, successRate: 1.0, avgLatencyMs: 100, last30Days: { invocations: 5, revenue: 200 } };
+      (clients.provider!.getAgentStats as ReturnType<typeof vi.fn>).mockResolvedValue(stats);
+
+      register(mockServer as any, clients);
+      const handler = tools.get("asc_registry_get_agent_stats")!;
+      const result = await handler({ agentId: "agt_1" });
+
+      expect(clients.provider!.getAgentStats).toHaveBeenCalledWith("agt_1");
+      expect(parseResult(result)).toEqual(stats);
+    });
+
+    it("returns error when no credentials configured", async () => {
+      const clients = makeClients({ consumer: null, provider: null });
+      register(mockServer as any, clients);
+
+      const handler = tools.get("asc_registry_get_agent_stats")!;
+      const result: any = await handler({ agentId: "agt_1" });
 
       expect(result.isError).toBe(true);
       expect(result.content[0].text).toContain("No credentials configured");

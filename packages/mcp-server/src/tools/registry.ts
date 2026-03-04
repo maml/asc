@@ -223,16 +223,20 @@ export function register(server: McpServer, clients: Clients): void {
     }
   );
 
-  // --- List Agents ---
+  // --- List Agents (with marketplace search/filter/sort) ---
   server.tool(
     "asc_registry_list_agents",
-    "List registered agents with optional filters",
+    "Search and discover agents in the marketplace. Supports text search, filtering by status/pricing/capability, and sorting by name/date/price.",
     {
       cursor: z.string().optional().describe("Pagination cursor"),
       limit: z.number().optional().describe("Max results"),
-      status: z.string().optional().describe("Filter by status"),
-      capability: z.string().optional().describe("Filter by capability"),
+      status: z.string().optional().describe("Filter by status (active, draft, deprecated, disabled)"),
+      capability: z.string().optional().describe("Filter by capability name"),
       providerId: z.string().optional().describe("Filter by provider ID"),
+      search: z.string().optional().describe("Free-text search on agent name and description"),
+      pricingType: z.enum(["per_invocation", "per_token", "per_second", "flat_monthly"]).optional().describe("Filter by pricing model"),
+      sort: z.enum(["name", "created_at", "price"]).optional().describe("Sort field"),
+      sortDir: z.enum(["asc", "desc"]).optional().describe("Sort direction"),
     },
     async (params) => {
       try {
@@ -242,6 +246,30 @@ export function register(server: McpServer, clients: Clients): void {
         }
         if (clients.provider) {
           const result = await clients.provider.listAgents(params);
+          return formatResult(result);
+        }
+        return formatError(new Error("No credentials configured"));
+      } catch (err) {
+        return formatError(err);
+      }
+    }
+  );
+
+  // --- Agent Stats ---
+  server.tool(
+    "asc_registry_get_agent_stats",
+    "Get usage statistics for an agent: total invocations, success rate, average latency, and 30-day revenue. Useful for evaluating agent reliability before routing work.",
+    {
+      agentId: z.string().describe("Agent ID to get stats for"),
+    },
+    async (params) => {
+      try {
+        if (clients.consumer) {
+          const result = await clients.consumer.getAgentStats(params.agentId);
+          return formatResult(result);
+        }
+        if (clients.provider) {
+          const result = await clients.provider.getAgentStats(params.agentId);
           return formatResult(result);
         }
         return formatError(new Error("No credentials configured"));

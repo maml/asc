@@ -115,7 +115,10 @@ export class AscConsumer extends BaseClient {
   // --- Discovery ---
 
   async listAgents(
-    opts?: { cursor?: string; limit?: number; providerId?: string; status?: string; capability?: string },
+    opts?: {
+      cursor?: string; limit?: number; providerId?: string; status?: string; capability?: string;
+      search?: string; pricingType?: string; sort?: "name" | "created_at" | "price"; sortDir?: "asc" | "desc";
+    },
   ): Promise<{ agents: Agent[]; pagination: PaginationResponse }> {
     const params = new URLSearchParams();
     if (opts?.cursor) params.set("cursor", opts.cursor);
@@ -123,11 +126,22 @@ export class AscConsumer extends BaseClient {
     if (opts?.providerId) params.set("providerId", opts.providerId);
     if (opts?.status) params.set("status", opts.status);
     if (opts?.capability) params.set("capability", opts.capability);
+    if (opts?.search) params.set("search", opts.search);
+    if (opts?.pricingType) params.set("pricingType", opts.pricingType);
+    if (opts?.sort) params.set("sort", opts.sort);
+    if (opts?.sortDir) params.set("sortDir", opts.sortDir);
     return this.request("GET", `/api/agents?${params}`);
   }
 
   async getAgent(agentId: AgentId | string): Promise<Agent> {
     return this.request("GET", `/api/agents/${agentId}`);
+  }
+
+  async getAgentStats(agentId: AgentId | string): Promise<{
+    totalInvocations: number; successRate: number; avgLatencyMs: number;
+    last30Days: { invocations: number; revenue: number };
+  }> {
+    return this.request("GET", `/api/agents/${agentId}/stats`);
   }
 
   async listProviders(

@@ -152,4 +152,58 @@ describe("PgAgentRepository", () => {
 
     await expect(repo.create(makeInput(bogusProviderId))).rejects.toThrow();
   });
+
+  // --- Marketplace: Search, Sort, Pricing Filter ---
+
+  it("list filters by search term (ILIKE on name)", async () => {
+    const provider = await createTestProvider(pool);
+    await repo.create(makeInput(provider.id, { name: "DocAnalyzer" }));
+    await repo.create(makeInput(provider.id, { name: "ChatBot" }));
+
+    const result = await repo.list({ limit: 10 }, { search: "doc" });
+
+    expect(result.items).toHaveLength(1);
+    expect(result.items[0].name).toBe("DocAnalyzer");
+  });
+
+  it("list filters by pricingType", async () => {
+    const provider = await createTestProvider(pool);
+    await repo.create(makeInput(provider.id, {
+      name: "token-agent",
+      pricing: { type: "per_token", inputPricePerToken: { amountCents: 1, currency: "USD" }, outputPricePerToken: { amountCents: 2, currency: "USD" } },
+    }));
+    await repo.create(makeInput(provider.id, {
+      name: "call-agent",
+      pricing: { type: "per_invocation", pricePerCall: { amountCents: 50, currency: "USD" } },
+    }));
+
+    const result = await repo.list({ limit: 10 }, { pricingType: "per_token" });
+
+    expect(result.items).toHaveLength(1);
+    expect(result.items[0].name).toBe("token-agent");
+  });
+
+  it("list sorts by name ascending", async () => {
+    const provider = await createTestProvider(pool);
+    await repo.create(makeInput(provider.id, { name: "Zebra" }));
+    await repo.create(makeInput(provider.id, { name: "Alpha" }));
+
+    const result = await repo.list({ limit: 10 }, { sort: "name", sortDir: "asc" });
+
+    expect(result.items).toHaveLength(2);
+    expect(result.items[0].name).toBe("Alpha");
+    expect(result.items[1].name).toBe("Zebra");
+  });
+
+  it("list sorts by created_at descending", async () => {
+    const provider = await createTestProvider(pool);
+    const first = await repo.create(makeInput(provider.id, { name: "First" }));
+    const second = await repo.create(makeInput(provider.id, { name: "Second" }));
+
+    const result = await repo.list({ limit: 10 }, { sort: "created_at", sortDir: "desc" });
+
+    expect(result.items).toHaveLength(2);
+    expect(result.items[0].id).toBe(second.id);
+    expect(result.items[1].id).toBe(first.id);
+  });
 });
