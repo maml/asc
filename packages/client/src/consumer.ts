@@ -1,6 +1,6 @@
 import { BaseClient, unauthenticatedPost } from "./base.js";
 import { AscTimeoutError } from "./errors.js";
-import type { ConsumerId, AgentId, CoordinationId, TaskId } from "./types.js";
+import type { ConsumerId, AgentId, CoordinationId, TaskId, PipelineId, PipelineExecutionId } from "./types.js";
 import type {
   ConsumerOrg,
   ConsumerRegistrationRequest,
@@ -12,6 +12,9 @@ import type {
   BillingEvent,
   Trace,
   PaginationResponse,
+  Pipeline,
+  PipelineExecution,
+  PipelineStepDef,
 } from "./types.js";
 
 export interface AscConsumerOptions {
@@ -176,6 +179,60 @@ export class AscConsumer extends BaseClient {
   async getTrace(traceId: string): Promise<Trace> {
     const res = await this.request<{ trace: Trace }>("GET", `/api/traces/${traceId}`);
     return res.trace;
+  }
+
+  // --- Pipelines ---
+
+  async createPipeline(body: {
+    name: string;
+    description?: string;
+    steps: PipelineStepDef[];
+    priority?: string;
+    metadata?: Record<string, string>;
+  }): Promise<Pipeline> {
+    return this.request("POST", "/api/pipelines", body);
+  }
+
+  async getPipeline(id: PipelineId | string): Promise<Pipeline> {
+    return this.request("GET", `/api/pipelines/${id}`);
+  }
+
+  async listPipelines(): Promise<{ pipelines: Pipeline[] }> {
+    return this.request("GET", "/api/pipelines");
+  }
+
+  async deletePipeline(id: PipelineId | string): Promise<void> {
+    return this.request("DELETE", `/api/pipelines/${id}`);
+  }
+
+  async executePipeline(
+    id: PipelineId | string,
+    body?: { input?: unknown; metadata?: Record<string, string> },
+  ): Promise<PipelineExecution> {
+    return this.request("POST", `/api/pipelines/${id}/execute`, body ?? {});
+  }
+
+  async getPipelineExecution(id: PipelineExecutionId | string): Promise<PipelineExecution> {
+    return this.request("GET", `/api/pipeline-executions/${id}`);
+  }
+
+  async waitForPipeline(
+    executionId: PipelineExecutionId | string,
+    opts?: { timeoutMs?: number; intervalMs?: number },
+  ): Promise<PipelineExecution> {
+    const timeoutMs = opts?.timeoutMs ?? 120_000;
+    const intervalMs = opts?.intervalMs ?? 1_000;
+    const deadline = Date.now() + timeoutMs;
+
+    while (Date.now() < deadline) {
+      const exec = await this.getPipelineExecution(executionId);
+      if (exec.status === "completed" || exec.status === "failed") {
+        return exec;
+      }
+      await new Promise((resolve) => setTimeout(resolve, intervalMs));
+    }
+
+    throw new AscTimeoutError(executionId, timeoutMs);
   }
 }
 

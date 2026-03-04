@@ -353,3 +353,70 @@ export interface CircuitBreakerStatus {
   lastStateChange: Timestamp;
   config: CircuitBreakerConfig;
 }
+
+// --- Pipeline ---
+
+export type PipelineId = Brand<string, "PipelineId">;
+export type PipelineExecutionId = Brand<string, "PipelineExecutionId">;
+
+export type MappingOp =
+  | { op: "pick"; fields: string[] }
+  | { op: "merge"; value: Record<string, unknown> };
+
+export type InputMapping = MappingOp[];
+
+export interface PipelineStepDef {
+  name: string;
+  agentId: AgentId;
+  inputMapping?: InputMapping;
+  timeoutMs?: number;
+  metadata?: Metadata;
+}
+
+export interface Pipeline {
+  id: PipelineId;
+  consumerId: ConsumerId;
+  name: string;
+  description: string;
+  steps: PipelineStepDef[];
+  priority: "low" | "normal" | "high" | "critical";
+  metadata: Metadata;
+  createdAt: Timestamp;
+}
+
+export type PipelineExecutionStatus = "pending" | "running" | "completed" | "failed";
+export type PipelineStepStatus = "pending" | "running" | "completed" | "failed" | "skipped";
+
+export interface PipelineExecution {
+  id: PipelineExecutionId;
+  pipelineId: PipelineId;
+  consumerId: ConsumerId;
+  traceId: TraceId;
+  status: PipelineExecutionStatus;
+  input: unknown;
+  output?: unknown;
+  error?: string;
+  failedStepIndex?: number;
+  currentStepIndex: number;
+  totalSteps: number;
+  createdAt: Timestamp;
+  startedAt?: Timestamp;
+  completedAt?: Timestamp;
+  metadata: Metadata;
+}
+
+export interface PipelineStepExecution {
+  executionId: PipelineExecutionId;
+  stepIndex: number;
+  stepName: string;
+  agentId: AgentId;
+  coordinationId?: CoordinationId;
+  taskId?: TaskId;
+  status: PipelineStepStatus;
+  input?: unknown;
+  output?: unknown;
+  error?: string;
+  startedAt?: Timestamp;
+  completedAt?: Timestamp;
+  durationMs?: number;
+}

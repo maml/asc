@@ -27,12 +27,16 @@ import { BillingService } from "./billing/service.js";
 import { registerBillingRoutes } from "./billing/routes.js";
 import { WsBroadcaster } from "./realtime/ws-broadcaster.js";
 import { registerRealtimeRoutes } from "./realtime/routes.js";
+import { PipelineRepository } from "./pipeline/repository.js";
+import { PipelineService } from "./pipeline/service.js";
+import { registerPipelineRoutes } from "./pipeline/routes.js";
 import { buildAuthHook } from "./auth/hook.js";
 import "./auth/types.js";
 
 export interface AppContext {
   app: FastifyInstance;
   coordService: CoordinationService;
+  pipelineService: PipelineService;
   circuitBreaker: CircuitBreakerManager;
   broadcaster: WsBroadcaster;
 }
@@ -74,6 +78,10 @@ export async function buildApp(pool: pg.Pool): Promise<AppContext> {
     coordRepo, agents, providerLookup, circuitBreaker, traceService, qualityService, slaService, billingService
   );
 
+  // Wire up pipeline engine
+  const pipelineRepo = new PipelineRepository(pool, broadcaster);
+  const pipelineService = new PipelineService(pipelineRepo, agents, coordService);
+
   // Build Fastify app
   const app = Fastify({ logger: false });
   await app.register(cors, { origin: true, methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"] });
@@ -90,7 +98,8 @@ export async function buildApp(pool: pg.Pool): Promise<AppContext> {
   registerCoordinationRoutes(app, coordService);
   registerObservabilityRoutes(app, traceService, slaService, qualityService);
   registerBillingRoutes(app, billingService);
+  registerPipelineRoutes(app, pipelineService);
   registerRealtimeRoutes(app, broadcaster, circuitBreaker, pool);
 
-  return { app, coordService, circuitBreaker, broadcaster };
+  return { app, coordService, pipelineService, circuitBreaker, broadcaster };
 }

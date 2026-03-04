@@ -241,6 +241,78 @@ describe("AscConsumer", () => {
     expect(result).toEqual(trace);
   });
 
+  // --- Pipelines ---
+
+  it("createPipeline sends POST /api/pipelines", async () => {
+    const mockPipeline = { id: "pipe_1", name: "test" };
+    globalThis.fetch = mockFetch(201, { data: mockPipeline }, "POST", "/api/pipelines");
+    const result = await consumer.createPipeline({
+      name: "test",
+      steps: [{ name: "s1", agentId: "agent_1" }] as never,
+    });
+    expect(result).toEqual(mockPipeline);
+  });
+
+  it("getPipeline sends GET /api/pipelines/:id", async () => {
+    const mockPipeline = { id: "pipe_1", name: "test" };
+    globalThis.fetch = mockFetch(200, { data: mockPipeline }, "GET", "/api/pipelines/pipe_1");
+    const result = await consumer.getPipeline("pipe_1");
+    expect(result).toEqual(mockPipeline);
+  });
+
+  it("listPipelines sends GET /api/pipelines", async () => {
+    globalThis.fetch = mockFetch(200, { data: { pipelines: [] } }, "GET", "/api/pipelines");
+    const result = await consumer.listPipelines();
+    expect(result.pipelines).toEqual([]);
+  });
+
+  it("deletePipeline sends DELETE /api/pipelines/:id", async () => {
+    globalThis.fetch = mockFetch(204, null, "DELETE", "/api/pipelines/pipe_1");
+    await consumer.deletePipeline("pipe_1");
+    expect(globalThis.fetch).toHaveBeenCalledOnce();
+  });
+
+  it("executePipeline sends POST /api/pipelines/:id/execute", async () => {
+    const mockExec = { id: "exec_1", status: "pending" };
+    globalThis.fetch = mockFetch(202, { data: mockExec }, "POST", "/api/pipelines/pipe_1/execute");
+    const result = await consumer.executePipeline("pipe_1", { input: { text: "hi" } });
+    expect(result).toEqual(mockExec);
+  });
+
+  it("getPipelineExecution sends GET /api/pipeline-executions/:id", async () => {
+    const mockExec = { id: "exec_1", status: "completed" };
+    globalThis.fetch = mockFetch(200, { data: mockExec }, "GET", "/api/pipeline-executions/exec_1");
+    const result = await consumer.getPipelineExecution("exec_1");
+    expect(result).toEqual(mockExec);
+  });
+
+  it("waitForPipeline polls until completed", async () => {
+    let callCount = 0;
+    globalThis.fetch = vi.fn(async () => {
+      callCount++;
+      const status = callCount >= 3 ? "completed" : "running";
+      return new Response(
+        JSON.stringify({ data: { id: "exec_1", status, output: callCount >= 3 ? { done: true } : undefined } }),
+        { status: 200 },
+      );
+    });
+    const result = await consumer.waitForPipeline("exec_1", { intervalMs: 10 });
+    expect(result.status).toBe("completed");
+    expect(callCount).toBe(3);
+  });
+
+  it("waitForPipeline throws on timeout", async () => {
+    globalThis.fetch = vi.fn(async () => {
+      return new Response(
+        JSON.stringify({ data: { id: "exec_1", status: "running" } }),
+        { status: 200 },
+      );
+    });
+    await expect(
+      consumer.waitForPipeline("exec_1", { timeoutMs: 100, intervalMs: 20 }),
+    ).rejects.toThrow(AscTimeoutError);
+  });
+
   // --- Error handling ---
 
   it("throws AscError on 401", async () => {

@@ -7,9 +7,11 @@ const PORT = parseInt(process.env["PORT"] ?? "3100", 10);
 async function main(): Promise<void> {
   await runMigrations();
   const pool = getPool();
-  const { app } = await buildApp(pool);
+  const { app, pipelineService, coordService } = await buildApp(pool);
 
   const shutdown = async () => {
+    await pipelineService.drain();
+    await coordService.drain();
     await app.close();
     await closePool();
     process.exit(0);
