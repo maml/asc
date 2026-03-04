@@ -19,6 +19,7 @@ export type BillingEventId = Brand<string, "BillingEventId">;
 export type QualityGateId = Brand<string, "QualityGateId">;
 export type InvoiceId = Brand<string, "InvoiceId">;
 export type CryptoKeyId = Brand<string, "CryptoKeyId">;
+export type SettlementId = Brand<string, "SettlementId">;
 
 // --- Crypto Identity ---
 
@@ -448,4 +449,54 @@ export interface PipelineEvent {
   traceId: TraceId;
   payload: Record<string, unknown>;
   timestamp: Timestamp;
+}
+
+// --- Settlement ---
+
+export type SettlementNetwork = "lightning" | "liquid" | "stripe" | "noop";
+export type SettlementStatus = "pending" | "processing" | "settled" | "failed";
+
+export interface ProviderSettlementConfig {
+  providerId: ProviderId;
+  network: SettlementNetwork;
+  lightningAddress?: string;
+  liquidAddress?: string;
+  stripeConnectAccountId?: string;
+  enabled: boolean;
+  metadata: Record<string, unknown>;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
+export interface Settlement {
+  id: SettlementId;
+  billingEventId: BillingEventId;
+  providerId: ProviderId;
+  consumerId: ConsumerId;
+  agentId: AgentId;
+  network: SettlementNetwork;
+  status: SettlementStatus;
+  grossAmountCents: number;
+  providerAmountCents: number;
+  platformFeeCents: number;
+  networkFeeCents: number;
+  currency: string;
+  exchangeRate?: number;
+  externalId?: string;
+  externalStatus?: string;
+  attemptCount: number;
+  lastAttemptAt?: Timestamp;
+  settledAt?: Timestamp;
+  error?: string;
+  metadata: Record<string, unknown>;
+  createdAt: Timestamp;
+}
+
+export interface SettlementSummary {
+  totalGrossCents: number;
+  totalProviderCents: number;
+  totalPlatformFeeCents: number;
+  totalNetworkFeeCents: number;
+  settlementCount: number;
+  byNetwork: Record<string, { count: number; totalCents: number }>;
 }

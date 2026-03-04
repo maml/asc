@@ -12,3 +12,4 @@ export * from "./circuit-breaker.js";
 export * from "./provider-interface.js";
 export * from "./api.js";
 export * from "./pipeline.js";
+export * from "./settlement.js";

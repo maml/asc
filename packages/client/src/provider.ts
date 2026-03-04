@@ -17,6 +17,10 @@ import type {
   PaginationResponse,
   RegisteredKey,
   KeyPathInfo,
+  ProviderSettlementConfig,
+  Settlement,
+  SettlementSummary,
+  SettlementNetwork,
 } from "./types.js";
 
 export interface AscProviderOptions {
@@ -232,6 +236,66 @@ export class AscProvider extends BaseClient {
 
   async revokeKey(keyId: CryptoKeyId | string): Promise<RegisteredKey> {
     return this.request("DELETE", `/api/keys/${keyId}`);
+  }
+
+  // --- Settlement ---
+
+  async getSettlementConfig(): Promise<ProviderSettlementConfig> {
+    const res = await this.request<{ config: ProviderSettlementConfig }>(
+      "GET",
+      `/api/providers/${this.providerId}/settlement-config`,
+    );
+    return res.config;
+  }
+
+  async updateSettlementConfig(config: {
+    network: SettlementNetwork;
+    lightningAddress?: string;
+    liquidAddress?: string;
+    stripeConnectAccountId?: string;
+    enabled?: boolean;
+    metadata?: Record<string, unknown>;
+  }): Promise<ProviderSettlementConfig> {
+    const res = await this.request<{ config: ProviderSettlementConfig }>(
+      "PUT",
+      `/api/providers/${this.providerId}/settlement-config`,
+      config,
+    );
+    return res.config;
+  }
+
+  async deleteSettlementConfig(): Promise<void> {
+    return this.request("DELETE", `/api/providers/${this.providerId}/settlement-config`);
+  }
+
+  async listSettlements(
+    opts?: { status?: string; network?: string; limit?: number },
+  ): Promise<Settlement[]> {
+    const params = new URLSearchParams();
+    params.set("providerId", this.providerId);
+    if (opts?.status) params.set("status", opts.status);
+    if (opts?.network) params.set("network", opts.network);
+    if (opts?.limit) params.set("limit", String(opts.limit));
+    const res = await this.request<{ settlements: Settlement[] }>(
+      "GET",
+      `/api/settlements?${params}`,
+    );
+    return res.settlements;
+  }
+
+  async getSettlementSummary(opts: {
+    periodStart: string;
+    periodEnd: string;
+  }): Promise<SettlementSummary> {
+    const params = new URLSearchParams();
+    params.set("providerId", this.providerId);
+    params.set("periodStart", opts.periodStart);
+    params.set("periodEnd", opts.periodEnd);
+    const res = await this.request<{ summary: SettlementSummary }>(
+      "GET",
+      `/api/settlements/summary?${params}`,
+    );
+    return res.summary;
   }
 }
 

@@ -34,6 +34,12 @@ import { buildAuthHook } from "./auth/hook.js";
 import { PgCryptoKeyRepository } from "./crypto/repository.js";
 import { buildSignatureAuthHook } from "./crypto/verify.js";
 import { registerCryptoRoutes } from "./crypto/routes.js";
+import { SettlementRepository } from "./settlement/repository.js";
+import { SettlementService } from "./settlement/service.js";
+import { registerSettlementRoutes } from "./settlement/routes.js";
+import { NoopAdapter } from "./settlement/adapters/noop.js";
+import { StrikeAdapter } from "./settlement/adapters/strike.js";
+import type { SettlementNetwork, SettlementAdapter } from "./types/settlement.js";
 import "./auth/types.js";
 import "./crypto/types.js";
 
@@ -74,9 +80,21 @@ export async function buildApp(pool: pg.Pool): Promise<AppContext> {
   const qualityRepo = new QualityGateRepository(pool);
   const qualityService = new QualityService(qualityRepo);
 
-  // Wire up billing
+  // Wire up settlement
+  const settlementRepo = new SettlementRepository(pool);
+  const settlementAdapters = new Map<SettlementNetwork, SettlementAdapter>();
+  settlementAdapters.set("noop", new NoopAdapter());
+  if (process.env["STRIKE_API_KEY"]) {
+    settlementAdapters.set("lightning", new StrikeAdapter({ apiKey: process.env["STRIKE_API_KEY"] }));
+  }
+  const settlementService = new SettlementService(settlementRepo, settlementAdapters, {
+    defaultFeePercentage: 0.02,
+    minimumFeeCents: 1,
+  });
+
+  // Wire up billing (with settlement)
   const billingRepo = new BillingRepository(pool);
-  const billingService = new BillingService(billingRepo, agents);
+  const billingService = new BillingService(billingRepo, agents, settlementService);
 
   const coordService = new CoordinationService(
     coordRepo, agents, providerLookup, circuitBreaker, traceService, qualityService, slaService, billingService
@@ -121,6 +139,7 @@ export async function buildApp(pool: pg.Pool): Promise<AppContext> {
   registerBillingRoutes(app, billingService);
   registerPipelineRoutes(app, pipelineService);
   registerCryptoRoutes(app, cryptoKeyRepo);
+  registerSettlementRoutes(app, settlementService);
   registerRealtimeRoutes(app, broadcaster, circuitBreaker, pool);
 
   return { app, coordService, pipelineService, circuitBreaker, broadcaster };

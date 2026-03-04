@@ -19,3 +19,4 @@ export type InvoiceId = Brand<string, "InvoiceId">;
 export type PipelineId = Brand<string, "PipelineId">;
 export type PipelineExecutionId = Brand<string, "PipelineExecutionId">;
 export type CryptoKeyId = Brand<string, "CryptoKeyId">;
+export type SettlementId = Brand<string, "SettlementId">;

@@ -23,6 +23,7 @@ const MIGRATION_FILES = [
   "005_auth_indexes.sql",
   "006_pipelines.sql",
   "007_crypto_keys.sql",
+  "008_settlements.sql",
 ];
 
 export async function setup(): Promise<void> {

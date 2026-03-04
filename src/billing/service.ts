@@ -4,11 +4,13 @@ import type { AgentId } from "../types/brand.js";
 import type { BillingEvent, InvoiceSummary, PricingSnapshot } from "../types/billing.js";
 import type { BillingRepository } from "./repo.js";
 import type { AgentRepository } from "../registry/repository.js";
+import type { SettlementService } from "../settlement/service.js";
 
 export class BillingService {
   constructor(
     private billingRepo: BillingRepository,
-    private agentRepo: AgentRepository
+    private agentRepo: AgentRepository,
+    private settlementService?: SettlementService,
   ) {}
 
   /** Record a billable invocation — looks up agent pricing and calculates the charge */
@@ -47,7 +49,7 @@ export class BillingService {
       capturedAt: new Date().toISOString(),
     };
 
-    return this.billingRepo.recordEvent({
+    const billingEvent = await this.billingRepo.recordEvent({
       taskId: task.id,
       agentId: task.agentId,
       providerId: agent.providerId,
@@ -57,6 +59,13 @@ export class BillingService {
       pricingSnapshot,
       metadata: { traceId: task.traceId },
     });
+
+    // Fire-and-forget settlement — errors are silently caught
+    if (this.settlementService) {
+      this.settlementService.settleBillingEvent(billingEvent).catch(() => {});
+    }
+
+    return billingEvent;
   }
 
   async listEvents(opts: {

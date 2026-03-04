@@ -19,6 +19,7 @@ import type {
   PipelineStepDef,
   RegisteredKey,
   KeyPathInfo,
+  Settlement,
 } from "./types.js";
 
 export interface AscConsumerOptions {
@@ -285,6 +286,23 @@ export class AscConsumer extends BaseClient {
 
   async revokeKey(keyId: CryptoKeyId | string): Promise<RegisteredKey> {
     return this.request("DELETE", `/api/keys/${keyId}`);
+  }
+
+  // --- Settlement ---
+
+  async listSettlements(
+    opts?: { status?: string; network?: string; limit?: number },
+  ): Promise<Settlement[]> {
+    const params = new URLSearchParams();
+    params.set("consumerId", this.consumerId);
+    if (opts?.status) params.set("status", opts.status);
+    if (opts?.network) params.set("network", opts.network);
+    if (opts?.limit) params.set("limit", String(opts.limit));
+    const res = await this.request<{ settlements: Settlement[] }>(
+      "GET",
+      `/api/settlements?${params}`,
+    );
+    return res.settlements;
   }
 }
 
