@@ -1,5 +1,6 @@
 // Global Fastify onRequest hook for API key authentication.
 // Extracts Bearer token, hashes it, looks up provider or consumer.
+// When signature headers are present (without Bearer), defers to the signature preHandler.
 
 import type { FastifyRequest, FastifyReply } from "fastify";
 import type { ProviderRepository, ConsumerRepository } from "../registry/repository.js";
@@ -18,6 +19,10 @@ function isPublicRoute(method: string, url: string): boolean {
   return PUBLIC_ROUTES.some(
     (r) => r.method === method && r.pattern.test(url)
   );
+}
+
+function hasSignatureHeaders(request: FastifyRequest): boolean {
+  return !!(request.headers["x-asc-signature"] || request.headers["x-asc-publickey"]);
 }
 
 // In-memory cache: hash → identity. Keys never change so no TTL needed.
@@ -42,6 +47,22 @@ export function buildAuthHook(
     }
 
     const authHeader = request.headers.authorization;
+    const hasSigHeaders = hasSignatureHeaders(request);
+
+    // Ambiguous: both Bearer and signature headers present
+    if (authHeader?.startsWith("Bearer ") && hasSigHeaders) {
+      reply.status(400).send({
+        error: { code: "BAD_REQUEST", message: "Ambiguous authentication: provide Bearer token OR signature headers, not both", retryable: false },
+      });
+      return;
+    }
+
+    // If signature headers present (no Bearer), defer to signature preHandler
+    if (hasSigHeaders && !authHeader) {
+      return;
+    }
+
+    // No auth at all — 401
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       reply.status(401).send({
         error: { code: "UNAUTHORIZED", message: "Missing or invalid Authorization header", retryable: false },
@@ -69,7 +90,7 @@ export function buildAuthHook(
     // Look up provider first, then consumer
     const provider = await providers.findByApiKeyHash(hash);
     if (provider) {
-      const identity: AuthIdentity = { type: "provider", id: provider.id, entity: provider };
+      const identity: AuthIdentity = { type: "provider", id: provider.id, entity: provider, authMethod: "api_key" };
       if (authCache.size < MAX_CACHE_SIZE) {
         authCache.set(hash, identity);
       }
@@ -79,7 +100,7 @@ export function buildAuthHook(
 
     const consumer = await consumers.findByApiKeyHash(hash);
     if (consumer) {
-      const identity: AuthIdentity = { type: "consumer", id: consumer.id, entity: consumer };
+      const identity: AuthIdentity = { type: "consumer", id: consumer.id, entity: consumer, authMethod: "api_key" };
       if (authCache.size < MAX_CACHE_SIZE) {
         authCache.set(hash, identity);
       }

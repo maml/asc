@@ -18,6 +18,28 @@ export type SlaRuleId = Brand<string, "SlaRuleId">;
 export type BillingEventId = Brand<string, "BillingEventId">;
 export type QualityGateId = Brand<string, "QualityGateId">;
 export type InvoiceId = Brand<string, "InvoiceId">;
+export type CryptoKeyId = Brand<string, "CryptoKeyId">;
+
+// --- Crypto Identity ---
+
+export interface RegisteredKey {
+  id: CryptoKeyId;
+  entityType: "provider" | "consumer";
+  entityId: string;
+  publicKey: string;
+  keyPath: KeyPathInfo | null;
+  label: string;
+  status: "active" | "revoked";
+  createdAt: Timestamp;
+  revokedAt: Timestamp | null;
+}
+
+export interface KeyPathInfo {
+  purpose: number;
+  orgIndex: number;
+  scope: "provider-auth" | "consumer-auth" | "delegation";
+  childIndex: number;
+}
 
 // --- Common ---
 

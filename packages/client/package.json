@@ -11,7 +11,9 @@
       "types": "./dist/index.d.ts"
     }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsc",
     "test": "vitest run",
@@ -24,5 +26,10 @@
   "engines": {
     "node": ">=18.0.0"
   },
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "@noble/curves": "^2.0.1",
+    "@noble/hashes": "^2.0.1",
+    "@noble/secp256k1": "^3.0.0"
+  }
 }

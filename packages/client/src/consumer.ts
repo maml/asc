@@ -1,6 +1,6 @@
 import { BaseClient, unauthenticatedPost } from "./base.js";
 import { AscTimeoutError } from "./errors.js";
-import type { ConsumerId, AgentId, CoordinationId, TaskId, PipelineId, PipelineExecutionId } from "./types.js";
+import type { ConsumerId, AgentId, CoordinationId, TaskId, PipelineId, PipelineExecutionId, CryptoKeyId } from "./types.js";
 import type {
   ConsumerOrg,
   ConsumerRegistrationRequest,
@@ -15,11 +15,14 @@ import type {
   Pipeline,
   PipelineExecution,
   PipelineStepDef,
+  RegisteredKey,
+  KeyPathInfo,
 } from "./types.js";
 
 export interface AscConsumerOptions {
   baseUrl: string;
-  apiKey: string;
+  apiKey?: string;
+  privateKey?: Uint8Array;
   consumerId: ConsumerId;
 }
 
@@ -27,7 +30,14 @@ export class AscConsumer extends BaseClient {
   readonly consumerId: ConsumerId;
 
   constructor(opts: AscConsumerOptions) {
-    super(opts.baseUrl, opts.apiKey);
+    if (!opts.apiKey && !opts.privateKey) {
+      throw new Error("Either apiKey or privateKey must be provided");
+    }
+    super(
+      opts.baseUrl,
+      opts.apiKey ?? "",
+      opts.privateKey ? { privateKey: opts.privateKey } : undefined,
+    );
     this.consumerId = opts.consumerId;
   }
 
@@ -233,6 +243,20 @@ export class AscConsumer extends BaseClient {
     }
 
     throw new AscTimeoutError(executionId, timeoutMs);
+  }
+  // --- Key Management ---
+
+  async registerKey(publicKey: string, opts?: { keyPath?: KeyPathInfo; label?: string }): Promise<RegisteredKey> {
+    return this.request("POST", "/api/keys", { publicKey, ...opts });
+  }
+
+  async listKeys(): Promise<RegisteredKey[]> {
+    const res = await this.request<{ data: RegisteredKey[] }>("GET", "/api/keys");
+    return res as unknown as RegisteredKey[];
+  }
+
+  async revokeKey(keyId: CryptoKeyId | string): Promise<RegisteredKey> {
+    return this.request("DELETE", `/api/keys/${keyId}`);
   }
 }
 

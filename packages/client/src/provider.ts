@@ -1,5 +1,5 @@
 import { BaseClient, unauthenticatedPost } from "./base.js";
-import type { ProviderId, AgentId, SlaRuleId, QualityGateId } from "./types.js";
+import type { ProviderId, AgentId, SlaRuleId, QualityGateId, CryptoKeyId } from "./types.js";
 import type {
   ProviderOrg,
   ProviderRegistrationRequest,
@@ -15,11 +15,14 @@ import type {
   QualityCheckConfig,
   QualityCheckRecord,
   PaginationResponse,
+  RegisteredKey,
+  KeyPathInfo,
 } from "./types.js";
 
 export interface AscProviderOptions {
   baseUrl: string;
-  apiKey: string;
+  apiKey?: string;
+  privateKey?: Uint8Array;
   providerId: ProviderId;
 }
 
@@ -27,7 +30,14 @@ export class AscProvider extends BaseClient {
   readonly providerId: ProviderId;
 
   constructor(opts: AscProviderOptions) {
-    super(opts.baseUrl, opts.apiKey);
+    if (!opts.apiKey && !opts.privateKey) {
+      throw new Error("Either apiKey or privateKey must be provided");
+    }
+    super(
+      opts.baseUrl,
+      opts.apiKey ?? "",
+      opts.privateKey ? { privateKey: opts.privateKey } : undefined,
+    );
     this.providerId = opts.providerId;
   }
 
@@ -193,6 +203,21 @@ export class AscProvider extends BaseClient {
       `/api/quality-checks?${params}`,
     );
     return res.records;
+  }
+  // --- Key Management ---
+
+  async registerKey(publicKey: string, opts?: { keyPath?: KeyPathInfo; label?: string }): Promise<RegisteredKey> {
+    return this.request("POST", "/api/keys", { publicKey, ...opts });
+  }
+
+  async listKeys(): Promise<RegisteredKey[]> {
+    const res = await this.request<{ data: RegisteredKey[] }>("GET", "/api/keys");
+    // The response wraps in { data: keys }, but our request() unwraps { data: T }
+    return res as unknown as RegisteredKey[];
+  }
+
+  async revokeKey(keyId: CryptoKeyId | string): Promise<RegisteredKey> {
+    return this.request("DELETE", `/api/keys/${keyId}`);
   }
 }
 

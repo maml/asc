@@ -1,10 +1,20 @@
 import { AscError } from "./errors.js";
+import { signRequest } from "./signing.js";
+
+export interface SigningConfig {
+  privateKey: Uint8Array;
+}
 
 export class BaseClient {
+  private signingConfig?: SigningConfig;
+
   constructor(
     protected baseUrl: string,
     protected apiKey: string,
-  ) {}
+    signingConfig?: SigningConfig,
+  ) {
+    this.signingConfig = signingConfig;
+  }
 
   protected async request<T>(
     method: string,
@@ -12,15 +22,24 @@ export class BaseClient {
     body?: unknown,
   ): Promise<T> {
     const url = `${this.baseUrl}${path}`;
+    const bodyStr = body !== undefined ? JSON.stringify(body) : undefined;
     const headers: Record<string, string> = {
-      Authorization: `Bearer ${this.apiKey}`,
       "Content-Type": "application/json",
     };
+
+    if (this.signingConfig) {
+      // Signature auth — sign the request with private key
+      const sigHeaders = signRequest(this.signingConfig.privateKey, method, path, bodyStr);
+      Object.assign(headers, sigHeaders);
+    } else {
+      // API key auth
+      headers.Authorization = `Bearer ${this.apiKey}`;
+    }
 
     const res = await fetch(url, {
       method,
       headers,
-      body: body !== undefined ? JSON.stringify(body) : undefined,
+      body: bodyStr,
     });
 
     // 204 No Content — nothing to parse

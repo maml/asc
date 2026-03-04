@@ -31,7 +31,11 @@ import { PipelineRepository } from "./pipeline/repository.js";
 import { PipelineService } from "./pipeline/service.js";
 import { registerPipelineRoutes } from "./pipeline/routes.js";
 import { buildAuthHook } from "./auth/hook.js";
+import { PgCryptoKeyRepository } from "./crypto/repository.js";
+import { buildSignatureAuthHook } from "./crypto/verify.js";
+import { registerCryptoRoutes } from "./crypto/routes.js";
 import "./auth/types.js";
+import "./crypto/types.js";
 
 export interface AppContext {
   app: FastifyInstance;
@@ -82,10 +86,24 @@ export async function buildApp(pool: pg.Pool): Promise<AppContext> {
   const pipelineRepo = new PipelineRepository(pool, broadcaster);
   const pipelineService = new PipelineService(pipelineRepo, agents, coordService);
 
+  // Wire up crypto identity
+  const cryptoKeyRepo = new PgCryptoKeyRepository(pool);
+
   // Build Fastify app
   const app = Fastify({ logger: false });
   await app.register(cors, { origin: true, methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"] });
   await app.register(websocket);
+
+  // Capture raw body for signature verification (must be before JSON parser runs)
+  app.addContentTypeParser("application/json", { parseAs: "buffer" }, (req, body, done) => {
+    (req as any).rawBody = body;
+    try {
+      const json = body.length > 0 ? JSON.parse(body.toString()) : undefined;
+      done(null, json);
+    } catch (err: any) {
+      done(err, undefined);
+    }
+  });
 
   // Health check
   app.get("/health", async () => ({ status: "ok" }));
@@ -93,12 +111,16 @@ export async function buildApp(pool: pg.Pool): Promise<AppContext> {
   // Auth middleware — validates API keys on all non-public routes
   app.addHook("onRequest", buildAuthHook(providers, consumers));
 
+  // Signature auth — runs after API key hook, picks up requests with sig headers
+  app.addHook("preHandler", buildSignatureAuthHook(cryptoKeyRepo, providers, consumers));
+
   // Register all routes
   registerRoutes(app, registryService);
   registerCoordinationRoutes(app, coordService);
   registerObservabilityRoutes(app, traceService, slaService, qualityService);
   registerBillingRoutes(app, billingService);
   registerPipelineRoutes(app, pipelineService);
+  registerCryptoRoutes(app, cryptoKeyRepo);
   registerRealtimeRoutes(app, broadcaster, circuitBreaker, pool);
 
   return { app, coordService, pipelineService, circuitBreaker, broadcaster };

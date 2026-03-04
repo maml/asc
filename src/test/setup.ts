@@ -24,6 +24,7 @@ export function getTestPool(): pg.Pool {
 
 // FK-safe truncation in dependency order (children before parents)
 const TABLES_IN_TRUNCATION_ORDER = [
+  "crypto_keys",
   "pipeline_events",
   "pipeline_step_executions",
   "pipeline_executions",
