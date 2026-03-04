@@ -9,7 +9,10 @@
   },
   "scripts": {
     "build:client": "cd packages/client && tsc",
+    "build:mcp": "cd packages/mcp-server && tsc",
+    "start:mcp": "node packages/mcp-server/dist/index.js",
     "test:client": "cd packages/client && vitest run",
+    "test:mcp": "cd packages/mcp-server && vitest run",
     "dev": "tsx src/server.ts",
     "agents": "tsx src/simulated/start-agents.ts",
     "migrate": "tsx src/db/migrate.ts",
