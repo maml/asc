@@ -1,5 +1,5 @@
 {
-  "name": "@asc/client",
+  "name": "@asc-so/client",
   "version": "0.1.0",
   "description": "TypeScript client SDK for the Agentic Services Coordinator",
   "type": "module",

@@ -1,6 +1,6 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
-import { registerProvider, registerConsumer } from "@asc/client";
+import { registerProvider, registerConsumer } from "@asc-so/client";
 import type { Clients } from "../clients.js";
 import { formatResult, formatError } from "../util/errors.js";
 

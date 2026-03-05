@@ -10,11 +10,11 @@ let testPool: pg.Pool | null = null;
 export function getTestPool(): pg.Pool {
   if (!testPool) {
     testPool = new pg.Pool({
-      host: "localhost",
-      port: 5433,
-      user: "asc",
-      password: "asc_dev_password",
-      database: "asc_test",
+      host: process.env["DB_HOST"] ?? "localhost",
+      port: parseInt(process.env["DB_PORT"] ?? "5433", 10),
+      user: process.env["DB_USER"] ?? "asc",
+      password: process.env["DB_PASSWORD"] ?? "asc_dev_password",
+      database: process.env["DB_NAME"] ?? "asc_test",
       max: 5,
       idleTimeoutMillis: 10_000,
     });

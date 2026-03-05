@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { AscError, AscTimeoutError } from "@asc/client";
+import { AscError, AscTimeoutError } from "@asc-so/client";
 import { formatResult, formatError } from "../util/errors.js";
 
 describe("formatResult", () => {

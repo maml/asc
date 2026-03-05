@@ -1,4 +1,4 @@
-import { AscError, AscTimeoutError } from "@asc/client";
+import { AscError, AscTimeoutError } from "@asc-so/client";
 
 interface McpToolResult {
   [key: string]: unknown;
