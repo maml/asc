@@ -5,10 +5,7 @@ export interface Config {
 }
 
 export function loadConfig(): Config {
-  const baseUrl = process.env["ASC_BASE_URL"];
-  if (!baseUrl) {
-    throw new Error("ASC_BASE_URL is required");
-  }
+  const baseUrl = process.env["ASC_BASE_URL"] ?? "https://api.asc.so";
 
   const consumerKey = process.env["ASC_CONSUMER_API_KEY"];
   const consumerId = process.env["ASC_CONSUMER_ID"];

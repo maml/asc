@@ -11,8 +11,9 @@ describe("loadConfig", () => {
     vi.restoreAllMocks();
   });
 
-  it("throws if ASC_BASE_URL is missing", () => {
-    expect(() => loadConfig()).toThrow("ASC_BASE_URL is required");
+  it("defaults baseUrl to api.asc.so when ASC_BASE_URL is not set", () => {
+    const config = loadConfig();
+    expect(config.baseUrl).toBe("https://api.asc.so");
   });
 
   it("returns consumer config when consumer env vars are set", () => {

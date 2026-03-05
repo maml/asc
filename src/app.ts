@@ -39,6 +39,7 @@ import { SettlementService } from "./settlement/service.js";
 import { registerSettlementRoutes } from "./settlement/routes.js";
 import { NoopAdapter } from "./settlement/adapters/noop.js";
 import { StrikeAdapter } from "./settlement/adapters/strike.js";
+import { PhoenixdAdapter } from "./settlement/adapters/phoenixd.js";
 import type { SettlementNetwork, SettlementAdapter } from "./types/settlement.js";
 import "./auth/types.js";
 import "./crypto/types.js";
@@ -84,7 +85,13 @@ export async function buildApp(pool: pg.Pool): Promise<AppContext> {
   const settlementRepo = new SettlementRepository(pool);
   const settlementAdapters = new Map<SettlementNetwork, SettlementAdapter>();
   settlementAdapters.set("noop", new NoopAdapter());
-  if (process.env["STRIKE_API_KEY"]) {
+  // Lightning adapter: prefer phoenixd (self-hosted), fall back to Strike (custodial)
+  if (process.env["PHOENIXD_PASSWORD"]) {
+    settlementAdapters.set("lightning", new PhoenixdAdapter({
+      password: process.env["PHOENIXD_PASSWORD"],
+      baseUrl: process.env["PHOENIXD_URL"],
+    }));
+  } else if (process.env["STRIKE_API_KEY"]) {
     settlementAdapters.set("lightning", new StrikeAdapter({ apiKey: process.env["STRIKE_API_KEY"] }));
   }
   const settlementService = new SettlementService(settlementRepo, settlementAdapters, {
