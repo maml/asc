@@ -64,7 +64,7 @@ export default function AgentsPage() {
   const [pricingTypeFilter, setPricingTypeFilter] = useState("");
   const [capabilityFilter, setCapabilityFilter] = useState("");
   const [sortField, setSortField] = useState<string>("");
-  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   // Form state
   const [providerId, setProviderId] = useState("");

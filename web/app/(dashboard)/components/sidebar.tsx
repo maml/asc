@@ -36,7 +36,8 @@ const navigation: NavGroup[] = [
   {
     title: "System",
     items: [
-      { label: "System Canvas", href: "/canvas", icon: LayoutDashboard },
+      { label: "Overview", href: "/dashboard", icon: LayoutDashboard },
+      { label: "System Canvas", href: "/canvas", icon: Zap },
     ],
   },
   {
@@ -84,7 +85,7 @@ export function Sidebar() {
     >
       {/* Logo */}
       <div className="flex h-14 items-center border-b border-border-subtle px-4">
-        <Link href="/" className="flex items-center gap-2.5 overflow-hidden">
+        <Link href="/canvas" className="flex items-center gap-2.5 overflow-hidden">
           <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-accent-green/10">
             <Zap size={15} className="text-accent-green" />
           </div>

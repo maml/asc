@@ -38,14 +38,34 @@
   --color-accent-blue-dim: var(--accent-blue-dim);
   --color-accent-yellow: var(--accent-yellow);
   --color-accent-red: var(--accent-red);
+  --color-navy: #0F172A;
+  --color-navy-light: #1E293B;
+  --color-ice: #93C5FD;
+  --color-amber: #F59E0B;
+  --color-light: #F1F5F9;
+  --color-gray: #94A3B8;
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 5rem;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-geist-sans), system-ui, sans-serif;
+}
+
+/* Marketing page overrides — scoped to .marketing wrapper */
+.marketing {
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-jetbrains);
+  font-family: var(--font-inter), system-ui, sans-serif;
+  background: #0F172A;
+  color: #F1F5F9;
 }
 
 /* Scrollbar styling */

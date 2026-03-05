@@ -356,8 +356,8 @@ export default function ExecutionDetailPage() {
                         {typeConfig.label}
                       </span>
                       <span className="truncate text-muted-foreground">
-                        {event.payload.stepName && `${event.payload.stepName}`}
-                        {event.payload.error && ` — ${event.payload.error}`}
+                        {event.payload.stepName ? String(event.payload.stepName) : null}
+                        {event.payload.error ? ` — ${String(event.payload.error)}` : null}
                       </span>
                     </div>
                   );
