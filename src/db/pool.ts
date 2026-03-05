@@ -26,7 +26,7 @@ export function getPool(config: DbConfig = defaultConfig): pg.Pool {
       // Neon / production: use connection string with SSL
       const useSSL =
         databaseUrl.includes("sslmode=require") ||
-        process.env["NODE_ENV"] === "production";
+        ["production", "preview"].includes(process.env["NODE_ENV"] ?? "");
       pool = new pg.Pool({
         connectionString: databaseUrl,
         ssl: useSSL ? { rejectUnauthorized: false } : false,
