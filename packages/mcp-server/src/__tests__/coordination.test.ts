@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-vi.mock("@asc/client", () => ({
+vi.mock("@asc-so/client", () => ({
   AscError: class extends Error {
     code: string;
     statusCode: number;
@@ -145,7 +145,7 @@ describe("coordination tools", () => {
 
     it("returns isError with timeout message when waitForCompletion throws AscTimeoutError", async () => {
       // Import the mocked class to throw it
-      const { AscTimeoutError } = await import("@asc/client");
+      const { AscTimeoutError } = await import("@asc-so/client");
       mockConsumer.waitForCompletion.mockRejectedValueOnce(
         new AscTimeoutError("tsk_1", 5000),
       );

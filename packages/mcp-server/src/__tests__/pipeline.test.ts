@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
-vi.mock("@asc/client", () => ({
+vi.mock("@asc-so/client", () => ({
   AscError: class extends Error {
     code: string;
     statusCode: number;
@@ -227,7 +227,7 @@ describe("pipeline tools", () => {
     });
 
     it("returns timeout error when waitForPipeline throws AscTimeoutError", async () => {
-      const { AscTimeoutError } = await import("@asc/client");
+      const { AscTimeoutError } = await import("@asc-so/client");
       mockConsumer.waitForPipeline.mockRejectedValueOnce(
         new AscTimeoutError("pex_1", 5000),
       );

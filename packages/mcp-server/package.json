@@ -1,5 +1,5 @@
 {
-  "name": "@asc/mcp-server",
+  "name": "@asc-so/mcp-server",
   "version": "0.1.0",
   "description": "MCP server for the Agentic Services Coordinator",
   "type": "module",
@@ -15,7 +15,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@asc/client": "*",
+    "@asc-so/client": "*",
     "@modelcontextprotocol/sdk": "^1.12.1",
     "zod": "^3.24.3"
   },

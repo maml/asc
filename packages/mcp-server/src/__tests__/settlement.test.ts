@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-vi.mock("@asc/client", () => ({
+vi.mock("@asc-so/client", () => ({
   AscError: class extends Error {
     code: string;
     statusCode: number;

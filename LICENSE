@@ -20,8 +20,8 @@ The "Software" is each version of the software that we make available under
 these Terms and Conditions:
 
   asc - Agentic Services Coordinator
-  @asc/client - TypeScript Client SDK
-  @asc/mcp-server - MCP Server
+  @asc-so/client - TypeScript Client SDK
+  @asc-so/mcp-server - MCP Server
 
 Grant of Rights
 

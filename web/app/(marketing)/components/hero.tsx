@@ -5,7 +5,7 @@ const mcpConfig = `{
   "mcpServers": {
     "asc": {
       "command": "npx",
-      "args": ["@asc/mcp-server"],
+      "args": ["@asc-so/mcp-server"],
       "env": { "ASC_API_KEY": "asc_live_..." }
     }
   }

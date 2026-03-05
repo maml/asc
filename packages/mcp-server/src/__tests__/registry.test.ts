@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-// Mock @asc/client
-vi.mock("@asc/client", () => ({
+// Mock @asc-so/client
+vi.mock("@asc-so/client", () => ({
   registerProvider: vi.fn(),
   registerConsumer: vi.fn(),
   AscError: class AscError extends Error {
@@ -18,7 +18,7 @@ vi.mock("@asc/client", () => ({
   AscTimeoutError: class extends Error {},
 }));
 
-import { registerProvider, registerConsumer } from "@asc/client";
+import { registerProvider, registerConsumer } from "@asc-so/client";
 import { register } from "../tools/registry.js";
 import type { Clients } from "../clients.js";
 

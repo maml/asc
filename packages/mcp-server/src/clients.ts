@@ -1,5 +1,5 @@
-import { AscConsumer, AscProvider } from "@asc/client";
-import type { ConsumerId, ProviderId } from "@asc/client";
+import { AscConsumer, AscProvider } from "@asc-so/client";
+import type { ConsumerId, ProviderId } from "@asc-so/client";
 import type { Config } from "./config.js";
 
 export interface Clients {
