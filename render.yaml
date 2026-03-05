@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: asc-api
+    runtime: node
+    plan: starter
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "3100"
+      - key: CORS_ORIGIN
+        sync: false
+      - key: STRIKE_API_KEY
+        sync: false

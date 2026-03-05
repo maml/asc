@@ -26,7 +26,10 @@
   "engines": {
     "node": ">=18.0.0"
   },
-  "license": "ISC",
+  "license": "FSL-1.1-MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "@noble/curves": "^2.0.1",
     "@noble/hashes": "^2.0.1",

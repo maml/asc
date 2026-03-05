@@ -20,11 +20,27 @@ let pool: pg.Pool | null = null;
 
 export function getPool(config: DbConfig = defaultConfig): pg.Pool {
   if (!pool) {
-    pool = new pg.Pool({
-      ...config,
-      max: 20,
-      idleTimeoutMillis: 30_000,
-    });
+    const databaseUrl = process.env["DATABASE_URL"];
+
+    if (databaseUrl) {
+      // Neon / production: use connection string with SSL
+      const useSSL =
+        databaseUrl.includes("sslmode=require") ||
+        process.env["NODE_ENV"] === "production";
+      pool = new pg.Pool({
+        connectionString: databaseUrl,
+        ssl: useSSL ? { rejectUnauthorized: false } : false,
+        max: 20,
+        idleTimeoutMillis: 30_000,
+      });
+    } else {
+      // Local dev: use individual fields
+      pool = new pg.Pool({
+        ...config,
+        max: 20,
+        idleTimeoutMillis: 30_000,
+      });
+    }
   }
   return pool;
 }

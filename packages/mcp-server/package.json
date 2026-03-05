@@ -26,5 +26,8 @@
   "engines": {
     "node": ">=18.0.0"
   },
-  "license": "ISC"
+  "license": "FSL-1.1-MIT",
+  "publishConfig": {
+    "access": "public"
+  }
 }

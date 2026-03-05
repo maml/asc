@@ -20,7 +20,7 @@ async function main(): Promise<void> {
   process.on("SIGINT", shutdown);
 
   await app.listen({ port: PORT, host: "0.0.0.0" });
-  console.log(`ASC server running on port ${PORT}`);
+  console.log(`ASC server running on port ${PORT} [${process.env["NODE_ENV"] ?? "development"}]`);
 }
 
 main().catch((err) => {

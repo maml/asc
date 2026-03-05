@@ -10,6 +10,7 @@
     "doc": "docs"
   },
   "scripts": {
+    "start": "node dist/server.js",
     "build:client": "cd packages/client && tsc",
     "build:mcp": "cd packages/mcp-server && tsc",
     "start:mcp": "node packages/mcp-server/dist/index.js",
@@ -25,13 +26,20 @@
     "test:watch": "vitest",
     "test:unit": "vitest run '.unit.test.ts'",
     "test:repo": "vitest run '.repo.test.ts'",
-    "test:api": "vitest run '.api.test.ts'"
+    "test:api": "vitest run '.api.test.ts'",
+    "changeset": "changeset",
+    "version": "changeset version",
+    "release": "changeset publish"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "FSL-1.1-MIT",
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "type": "module",
   "devDependencies": {
+    "@changesets/cli": "^2.30.0",
     "@types/pg": "^8.16.0",
     "@types/ws": "^8.18.1",
     "tsx": "^4.21.0",

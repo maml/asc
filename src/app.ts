@@ -108,8 +108,13 @@ export async function buildApp(pool: pg.Pool): Promise<AppContext> {
   const cryptoKeyRepo = new PgCryptoKeyRepository(pool);
 
   // Build Fastify app
-  const app = Fastify({ logger: false });
-  await app.register(cors, { origin: true, methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"] });
+  const isProd = process.env["NODE_ENV"] === "production";
+  const app = Fastify({ logger: isProd ? { level: "info" } : false });
+
+  // CORS: use CORS_ORIGIN env var in production (comma-separated), allow all in dev
+  const corsOrigin = process.env["CORS_ORIGIN"];
+  const origin = corsOrigin ? corsOrigin.split(",").map((s) => s.trim()) : true;
+  await app.register(cors, { origin, methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"] });
   await app.register(websocket);
 
   // Capture raw body for signature verification (must be before JSON parser runs)
