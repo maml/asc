@@ -86,8 +86,8 @@ export function Sidebar() {
       {/* Logo */}
       <div className="flex h-14 items-center border-b border-border-subtle px-4">
         <Link href="/canvas" className="flex items-center gap-2.5 overflow-hidden">
-          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-accent-green/10">
-            <Zap size={15} className="text-accent-green" />
+          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-accent-amber/10">
+            <Zap size={15} className="text-accent-amber" />
           </div>
           {!collapsed && (
             <span className="font-mono text-sm font-semibold tracking-tight text-foreground">

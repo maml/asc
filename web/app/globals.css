@@ -1,18 +1,21 @@
 @import "tailwindcss";
 
 :root {
-  --background: #0a0a0a;
-  --foreground: #ededed;
-  --surface: #111111;
-  --surface-raised: #171717;
-  --surface-hover: #1c1c1c;
-  --border: #222222;
-  --border-subtle: #1a1a1a;
-  --muted: #6b6b6b;
-  --muted-foreground: #888888;
+  --background: #0F172A;
+  --foreground: #F1F5F9;
+  --surface: #1E293B;
+  --surface-raised: #263548;
+  --surface-hover: #2d3f54;
+  --border: #334155;
+  --border-subtle: #1E293B;
+  --muted: #475569;
+  --muted-foreground: #94A3B8;
   --accent-green: #10b981;
   --accent-green-dim: #065f46;
   --accent-green-glow: rgba(16, 185, 129, 0.12);
+  --accent-amber: #F59E0B;
+  --accent-amber-dim: #92400e;
+  --accent-amber-glow: rgba(245, 158, 11, 0.12);
   --accent-blue: #3b82f6;
   --accent-blue-dim: #1e3a5f;
   --accent-yellow: #f59e0b;
@@ -34,6 +37,8 @@
   --color-muted-foreground: var(--muted-foreground);
   --color-accent-green: var(--accent-green);
   --color-accent-green-dim: var(--accent-green-dim);
+  --color-accent-amber: var(--accent-amber);
+  --color-accent-amber-dim: var(--accent-amber-dim);
   --color-accent-blue: var(--accent-blue);
   --color-accent-blue-dim: var(--accent-blue-dim);
   --color-accent-yellow: var(--accent-yellow);
@@ -44,8 +49,8 @@
   --color-amber: #F59E0B;
   --color-light: #F1F5F9;
   --color-gray: #94A3B8;
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-jetbrains);
 }
 
 html {
@@ -56,14 +61,11 @@ html {
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  font-family: var(--font-inter), system-ui, sans-serif;
 }
 
 /* Marketing page overrides — scoped to .marketing wrapper */
 .marketing {
-  --font-sans: var(--font-inter);
-  --font-mono: var(--font-jetbrains);
-  font-family: var(--font-inter), system-ui, sans-serif;
   background: #0F172A;
   color: #F1F5F9;
 }
@@ -110,8 +112,8 @@ body {
 
 /* Nav item active indicator */
 .nav-active {
-  background: var(--accent-green-glow);
-  color: var(--accent-green);
+  background: var(--accent-amber-glow);
+  color: var(--accent-amber);
 }
 
 /* Keyframes for subtle entrance */
@@ -133,8 +135,8 @@ body {
 
 /* Canvas-specific variables */
 :root {
-  --canvas-bg: #080808;
-  --canvas-grid: rgba(34, 34, 34, 0.5);
+  --canvas-bg: #0B1120;
+  --canvas-grid: rgba(51, 65, 85, 0.5);
   --node-glow-green: rgba(16, 185, 129, 0.15);
   --node-glow-red: rgba(239, 68, 68, 0.15);
   --node-glow-yellow: rgba(245, 158, 11, 0.15);
