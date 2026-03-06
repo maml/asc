@@ -1,3 +1,5 @@
+# IMPORTANT: Change asc_dev_password before exposing to the internet.
+# For local development this default is fine.
 services:
   postgres:
     image: postgres:16-alpine
