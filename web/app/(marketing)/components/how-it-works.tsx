@@ -68,7 +68,7 @@ const capabilities = [
   {
     icon: Zap,
     title: "Lightning Settlement",
-    description: "L2-agnostic adapter pattern. Lightning via Strike, noop for dev. Platform fees, reconciliation, and provider config built in.",
+    description: "L2-agnostic adapter pattern. Lightning via Phoenixd, noop for dev. Platform fees, reconciliation, and provider config built in.",
   },
 ];
 
