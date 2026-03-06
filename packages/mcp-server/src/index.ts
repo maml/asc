@@ -9,6 +9,7 @@ import * as pipeline from "./tools/pipeline.js";
 import * as billing from "./tools/billing.js";
 import * as observability from "./tools/observability.js";
 import * as settlement from "./tools/settlement.js";
+import * as onboarding from "./tools/onboarding.js";
 
 const server = new McpServer({
   name: "asc",
@@ -24,6 +25,7 @@ pipeline.register(server, clients);
 billing.register(server, clients);
 observability.register(server, clients);
 settlement.register(server, clients);
+onboarding.register(server, clients);
 
 const transport = new StdioServerTransport();
 await server.connect(transport);

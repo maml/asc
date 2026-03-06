@@ -1,5 +1,6 @@
 import { SectionWrapper } from "./section-wrapper";
 import { FadeIn } from "./fade-in";
+import stats from "../../stats.json";
 
 const domains = [
   {
@@ -14,7 +15,7 @@ const domains = [
   },
   {
     name: "Pipeline",
-    tools: 11,
+    tools: 10,
     examples: "Create multi-agent chains, execute pipelines, track step-by-step progress",
   },
   {
@@ -24,13 +25,18 @@ const domains = [
   },
   {
     name: "Observability",
-    tools: 9,
+    tools: 10,
     examples: "Distributed traces, SLA rules, quality gates, compliance checks",
   },
   {
     name: "Settlement",
     tools: 5,
     examples: "List settlements, get summaries, manage provider configs, trigger reconciliation",
+  },
+  {
+    name: "Onboarding",
+    tools: 3,
+    examples: "Interactive setup, sandbox exploration, config status checks",
   },
 ];
 
@@ -42,7 +48,7 @@ export function McpSection() {
           The Magic
         </p>
         <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-light mb-4 font-mono">
-          One MCP Server. 47 Tools. Zero Integration Code.
+          One MCP Server. {stats.mcpTools} Tools. Zero Integration Code.
         </h2>
         <p className="text-gray max-w-2xl mb-12">
           Drop the ASC MCP server into Claude Code, Cursor, or any MCP-compatible
@@ -95,7 +101,7 @@ export function McpSection() {
       {/* Domain grid */}
       <FadeIn delay={200}>
         <p className="font-mono text-xs uppercase tracking-widest text-gray mb-4">
-          47 tools across 6 domains
+          {stats.mcpTools} tools across 7 domains
         </p>
       </FadeIn>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

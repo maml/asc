@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { FadeIn } from "./fade-in";
+import stats from "../../stats.json";
 
 export function Footer() {
   return (
@@ -14,8 +15,8 @@ export function Footer() {
               <span className="text-amber">Start using it.</span>
             </h2>
             <p className="text-gray max-w-lg mx-auto mb-8">
-              Open-source. Self-hostable. Production-ready. 352 tests. 23 endpoints.
-              47 MCP tools. Running today.
+              Open-source. Self-hostable. Production-ready. {stats.tests} tests. {stats.endpoints} endpoints.
+              {stats.mcpTools} MCP tools. Running today.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <a

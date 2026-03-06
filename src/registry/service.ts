@@ -19,6 +19,14 @@ import type {
 import type { WsBroadcaster } from "../realtime/ws-broadcaster.js";
 import { generateApiKey, hashApiKey } from "../auth/utils.js";
 
+// Map NODE_ENV to key environment for prefix generation
+function getKeyEnvironment(): "sandbox" | "production" | undefined {
+  const env = process.env["NODE_ENV"];
+  if (env === "preview") return "sandbox";
+  if (env === "production") return "production";
+  return undefined;
+}
+
 export class RegistryService {
   constructor(
     private providers: ProviderRepository,
@@ -38,7 +46,7 @@ export class RegistryService {
   // --- Providers ---
 
   async registerProvider(req: ProviderRegistrationRequest): Promise<{ provider: ProviderOrg; apiKey: string }> {
-    const apiKey = generateApiKey();
+    const apiKey = generateApiKey(getKeyEnvironment());
     const provider = await this.providers.create({
       name: req.name,
       description: req.description,
@@ -73,7 +81,7 @@ export class RegistryService {
   // --- Consumers ---
 
   async registerConsumer(req: ConsumerRegistrationRequest): Promise<{ consumer: ConsumerOrg; apiKey: string }> {
-    const apiKey = generateApiKey();
+    const apiKey = generateApiKey(getKeyEnvironment());
     const consumer = await this.consumers.create({
       name: req.name,
       description: req.description,

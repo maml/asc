@@ -1,0 +1,65 @@
+Functional Source License, Version 1.1, MIT Future License
+
+Abbreviation
+
+FSL-1.1-MIT
+
+Notice
+
+Copyright 2024-2026 ASC Contributors
+
+Terms and Conditions
+
+Licensor ("We")
+
+The copyright holders listed in the Notice above.
+
+The Software
+
+The "Software" is each version of the software that we make available under
+these Terms and Conditions:
+
+  asc - Agentic Services Coordinator
+  @asc-so/client - TypeScript Client SDK
+  @asc-so/mcp-server - MCP Server
+
+Grant of Rights
+
+Subject to the terms and conditions of this License, we hereby grant you the
+right to copy, modify, create derivative works, redistribute, and make
+non-production use of the Software. If your use of the Software does not
+qualify as Competing Use (as defined below), we also grant you the right to
+make production use of the Software.
+
+Competing Use
+
+"Competing Use" means making the Software available to third parties as a
+commercial hosted or managed service that substitutes for the Software. For
+clarity, the following are NOT Competing Use:
+
+  - Using the Software for internal business operations
+  - Using the Software to build and deploy your own products
+  - Modifying the Software for your own use
+  - Redistributing the Software with your own products
+  - Offering consulting or support services around the Software
+
+Change Date
+
+2028-03-04
+
+Change License
+
+MIT
+
+On the Change Date, this License converts automatically to the Change License,
+and the terms below no longer apply.
+
+No Warranty
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

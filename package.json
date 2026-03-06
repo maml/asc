@@ -29,7 +29,8 @@
     "test:api": "vitest run '.api.test.ts'",
     "changeset": "changeset",
     "version": "changeset version",
-    "release": "changeset publish"
+    "release": "changeset publish",
+    "seed:sandbox": "tsx scripts/sandbox-seed.ts"
   },
   "keywords": [],
   "author": "",
@@ -53,6 +54,7 @@
     "@noble/hashes": "^2.0.1",
     "@noble/secp256k1": "^3.0.0",
     "fastify": "^5.7.4",
-    "pg": "^8.18.0"
+    "pg": "^8.18.0",
+    "stripe": "^17.7.0"
   }
 }

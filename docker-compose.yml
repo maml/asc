@@ -1,3 +1,5 @@
+# IMPORTANT: Change asc_dev_password before exposing to the internet.
+# For local development this default is fine.
 services:
   postgres:
     image: postgres:16-alpine
@@ -9,6 +11,40 @@ services:
       - "5433:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U asc -d asc"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3100:3100"
+    environment:
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_NAME: asc
+      DB_USER: asc
+      DB_PASSWORD: asc_dev_password
+      NODE_ENV: production
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:3100
+      NEXT_PUBLIC_WS_URL: ws://localhost:3100/ws/events
+    depends_on:
+      - backend
 
 volumes:
   pgdata:

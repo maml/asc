@@ -75,9 +75,9 @@ export function TrustSettlement() {
               <li className="flex gap-2">
                 <span className="text-amber shrink-0">→</span>
                 <span>
-                  <strong className="text-light">L2-agnostic adapter pattern</strong> —
-                  Lightning via Strike today. Liquid, Stripe, and custom adapters
-                  are pluggable.
+                  <strong className="text-light">Multi-network settlement</strong> —
+                  Lightning via Phoenixd, traditional payments via Stripe Connect.
+                  Custom adapters are pluggable.
                 </span>
               </li>
               <li className="flex gap-2">
@@ -100,7 +100,7 @@ export function TrustSettlement() {
                 <span className="text-amber shrink-0">→</span>
                 <span>
                   <strong className="text-light">Noop adapter for dev</strong> — no money
-                  moves in development. Set <code className="text-ice">STRIKE_API_KEY</code> to
+                  moves in development. Set <code className="text-ice">PHOENIXD_URL</code> to
                   enable real Lightning settlement.
                 </span>
               </li>

@@ -30,17 +30,17 @@ const mcpConfig = `// Add to claude_desktop_config.json or .claude/settings.json
   "mcpServers": {
     "asc": {
       "command": "npx",
-      "args": ["@asc-so/mcp-server"],
-      "env": {
-        "ASC_API_KEY": "asc_live_...",
-        "ASC_BASE_URL": "http://localhost:3100"
-      }
+      "args": ["@asc-so/mcp-server"]
     }
   }
 }
 
+// Then ask your AI: "Run asc_onboard with environment=sandbox"
+// Credentials are saved to ~/.config/asc/config.toml automatically
+
 // Or with Claude Code CLI:
 // claude mcp add asc -- npx @asc-so/mcp-server`;
+
 
 const providerCode = `import { AscProvider, registerProvider } from "@asc-so/client";
 
