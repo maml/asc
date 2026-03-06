@@ -2,8 +2,12 @@
 
 import crypto from "node:crypto";
 
-export function generateApiKey(): string {
-  return `asc_${crypto.randomBytes(32).toString("hex")}`;
+export function generateApiKey(environment?: "sandbox" | "production"): string {
+  const prefix =
+    environment === "sandbox" ? "asc_test_" :
+    environment === "production" ? "asc_live_" :
+    "asc_";
+  return `${prefix}${crypto.randomBytes(32).toString("hex")}`;
 }
 
 export function hashApiKey(key: string): string {

@@ -29,7 +29,8 @@
     "test:api": "vitest run '.api.test.ts'",
     "changeset": "changeset",
     "version": "changeset version",
-    "release": "changeset publish"
+    "release": "changeset publish",
+    "seed:sandbox": "tsx scripts/sandbox-seed.ts"
   },
   "keywords": [],
   "author": "",

@@ -19,6 +19,18 @@ async function main(): Promise<void> {
   process.on("SIGTERM", shutdown);
   process.on("SIGINT", shutdown);
 
+  // Sandbox webhook: echoes input as output for demo agents (preview env only)
+  if (process.env["NODE_ENV"] === "preview") {
+    app.post("/sandbox-webhook", async (request, reply) => {
+      const body = request.body as Record<string, unknown>;
+      return reply.send({
+        status: "success",
+        output: body,
+        message: "Sandbox echo response",
+      });
+    });
+  }
+
   await app.listen({ port: PORT, host: "0.0.0.0" });
   console.log(`ASC server running on port ${PORT} [${process.env["NODE_ENV"] ?? "development"}]`);
 }
