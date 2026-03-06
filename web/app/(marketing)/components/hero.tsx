@@ -1,5 +1,6 @@
 import { ParticleCanvas } from "./particle-canvas";
 import { FadeIn } from "./fade-in";
+import stats from "../../stats.json";
 
 const mcpConfig = `{
   "mcpServers": {
@@ -22,7 +23,7 @@ export function Hero() {
           <div className="inline-flex items-center gap-3 font-mono text-[11px] uppercase tracking-widest text-gray mb-8">
             <span>Open Source</span>
             <span className="text-navy-light">·</span>
-            <span>50 MCP Tools</span>
+            <span>{stats.mcpTools} MCP Tools</span>
             <span className="text-navy-light">·</span>
             <span>Self-Hostable</span>
           </div>
@@ -63,7 +64,7 @@ export function Hero() {
             </pre>
           </div>
           <p className="text-sm text-gray mb-10">
-            50 tools for discovery, coordination, billing, observability, and settlement —
+            {stats.mcpTools} tools for discovery, coordination, billing, observability, and settlement —
             through natural conversation.
           </p>
         </FadeIn>
@@ -89,9 +90,9 @@ export function Hero() {
         {/* Social proof */}
         <FadeIn delay={500}>
           <div className="flex flex-wrap items-center justify-center gap-4 font-mono text-[11px] text-gray uppercase tracking-wider">
-            <span>527 tests</span>
+            <span>{stats.tests} tests</span>
             <span className="text-navy-light">·</span>
-            <span>57 endpoints</span>
+            <span>{stats.endpoints} endpoints</span>
             <span className="text-navy-light">·</span>
             <span>Dual auth</span>
             <span className="text-navy-light">·</span>
