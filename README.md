@@ -110,12 +110,12 @@ Migrations run automatically on startup.
 ### Run tests
 
 ```bash
-npm test                      # All 322 backend tests
+npm test                      # All backend tests
 npm run test:unit             # Unit tests only
 npm run test:repo             # Repository tests (needs Postgres)
 npm run test:api              # API integration tests
-npm run test:client           # SDK unit tests (69 tests)
-npm run test:mcp              # MCP server tests (89 tests)
+npm run test:client           # SDK unit tests
+npm run test:mcp              # MCP server tests
 ```
 
 ### Run the demo
