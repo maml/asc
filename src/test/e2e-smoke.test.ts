@@ -176,6 +176,9 @@ describe("E2E Smoke Tests", () => {
       const completedTask = await pollTaskStatus(app, taskId, ["completed"], consumerAuth);
       expect(completedTask["output"]).toEqual({ echo: { message: "smoke test" }, processed: true });
 
+      // Let fire-and-forget billing/trace writes settle
+      await ctx.coordService.drain();
+
       // 7. Verify trace exists (requires consumer auth)
       const tracesRes = await app.inject({ method: "GET", url: "/api/traces", headers: consumerAuth });
       const traces = tracesRes.json().data.traces;

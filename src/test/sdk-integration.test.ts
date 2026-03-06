@@ -143,6 +143,9 @@ describe("SDK Integration", () => {
       sdk: true,
     });
 
+    // Let fire-and-forget billing/trace writes settle
+    await ctx.coordService.drain();
+
     // 10. List events for the coordination
     const { events } = await cons.listEvents(coordinationId);
     const eventTypes = events.map((e) => e.payload.type);
