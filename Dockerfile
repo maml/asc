@@ -15,5 +15,7 @@ COPY --from=build /app/dist/ dist/
 COPY migrations/ migrations/
 RUN addgroup -S asc && adduser -S asc -G asc
 USER asc
+LABEL org.opencontainers.image.source="https://github.com/maml/asc"
+LABEL org.opencontainers.image.licenses="FSL-1.1-MIT"
 EXPOSE 3100
 CMD ["node", "dist/server.js"]

@@ -27,5 +27,7 @@ RUN chmod +x docker-entrypoint.sh
 
 RUN addgroup -S asc && adduser -S asc -G asc
 USER asc
+LABEL org.opencontainers.image.source="https://github.com/maml/asc"
+LABEL org.opencontainers.image.licenses="FSL-1.1-MIT"
 EXPOSE 3000
 ENTRYPOINT ["./docker-entrypoint.sh"]
