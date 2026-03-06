@@ -34,7 +34,7 @@ export function Header() {
     <header className="sticky top-0 z-20 flex h-14 items-center justify-between border-b border-border-subtle bg-background/80 px-6 backdrop-blur-md">
       {/* Breadcrumbs */}
       <nav className="flex items-center gap-1.5 text-sm">
-        <span className="text-muted-foreground">ASC</span>
+        <a href="/" className="text-muted-foreground hover:text-foreground transition-colors">ASC</a>
         {crumbs.map((crumb, i) => (
           <span key={crumb.path} className="flex items-center gap-1.5">
             <span className="text-muted">/</span>
