@@ -18,9 +18,10 @@ services:
       retries: 5
 
   backend:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: ghcr.io/maml/asc:latest
+    # build:            # uncomment for local development
+    #   context: .
+    #   dockerfile: Dockerfile
     ports:
       - "3100:3100"
     environment:
@@ -35,9 +36,10 @@ services:
         condition: service_healthy
 
   frontend:
-    build:
-      context: ./web
-      dockerfile: Dockerfile
+    image: ghcr.io/maml/asc/web:latest
+    # build:            # uncomment for local development
+    #   context: ./web
+    #   dockerfile: Dockerfile
     ports:
       - "3000:3000"
     environment:
