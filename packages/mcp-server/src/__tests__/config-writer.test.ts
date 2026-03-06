@@ -35,7 +35,7 @@ describe("writeConfig", () => {
 
     const result = writeConfig({
       environment: "sandbox",
-      baseUrl: "https://preview-api.asc.so",
+      baseUrl: "https://api.preview.asc.so",
       consumer: { apiKey: "asc_test_key", id: "con_123" },
     });
 
@@ -54,7 +54,7 @@ describe("writeConfig", () => {
 active = "sandbox"
 
 [sandbox]
-base_url = "https://preview-api.asc.so"
+base_url = "https://api.preview.asc.so"
 
 [sandbox.consumer]
 api_key = "old_key"
@@ -71,7 +71,7 @@ id = "con_prod"
 
     const result = writeConfig({
       environment: "sandbox",
-      baseUrl: "https://preview-api.asc.so",
+      baseUrl: "https://api.preview.asc.so",
       consumer: { apiKey: "asc_test_new", id: "con_new" },
       provider: { apiKey: "asc_test_prov", id: "prv_new" },
     });
@@ -94,7 +94,7 @@ id = "con_prod"
 
     writeConfig({
       environment: "sandbox",
-      baseUrl: "https://preview-api.asc.so",
+      baseUrl: "https://api.preview.asc.so",
       consumer: { apiKey: "key", id: "id" },
     });
 
@@ -123,7 +123,7 @@ id = "con_prod"
 
     const result = writeConfig({
       environment: "sandbox",
-      baseUrl: "https://preview-api.asc.so",
+      baseUrl: "https://api.preview.asc.so",
       consumer: { apiKey: "key", id: "id" },
     });
 

@@ -1,5 +1,5 @@
 // Sandbox seed script — registers demo agents and pipelines for new user exploration.
-// Usage: ASC_BASE_URL=https://preview-api.asc.so npm run seed:sandbox
+// Usage: ASC_BASE_URL=https://api.preview.asc.so npm run seed:sandbox
 
 import { registerProvider, registerConsumer, AscProvider, AscConsumer } from "@asc-so/client";
 import type { ProviderId, ConsumerId } from "@asc-so/client";

@@ -57,7 +57,7 @@ describe("loadConfig", () => {
 active = "sandbox"
 
 [sandbox]
-base_url = "https://preview-api.asc.so"
+base_url = "https://api.preview.asc.so"
 
 [sandbox.consumer]
 api_key = "asc_test_cons"
@@ -70,7 +70,7 @@ id = "prv_456"
     mockReadFileSync.mockReturnValue(toml);
     const config = loadConfig();
 
-    expect(config.baseUrl).toBe("https://preview-api.asc.so");
+    expect(config.baseUrl).toBe("https://api.preview.asc.so");
     expect(config.consumer).toEqual({ apiKey: "asc_test_cons", consumerId: "con_123" });
     expect(config.provider).toEqual({ apiKey: "asc_test_prov", providerId: "prv_456" });
   });
@@ -81,7 +81,7 @@ id = "prv_456"
 active = "sandbox"
 
 [sandbox]
-base_url = "https://preview-api.asc.so"
+base_url = "https://api.preview.asc.so"
 
 [sandbox.consumer]
 api_key = "asc_test_cons"
@@ -190,7 +190,7 @@ describe("getConfigStatus", () => {
 active = "sandbox"
 
 [sandbox]
-base_url = "https://preview-api.asc.so"
+base_url = "https://api.preview.asc.so"
 
 [sandbox.consumer]
 api_key = "asc_test_cons"

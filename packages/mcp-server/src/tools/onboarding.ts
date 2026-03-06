@@ -7,7 +7,7 @@ import { writeConfig } from "../config-writer.js";
 import { formatResult, formatError } from "../util/errors.js";
 
 const ENV_BASE_URLS: Record<string, string> = {
-  sandbox: "https://preview-api.asc.so",
+  sandbox: "https://api.preview.asc.so",
   production: "https://api.asc.so",
 };
 

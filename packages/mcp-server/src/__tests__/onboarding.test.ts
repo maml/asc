@@ -163,7 +163,7 @@ describe("onboarding tools", () => {
         contactEmail: "test@example.com",
       });
 
-      expect(registerConsumer).toHaveBeenCalledWith("https://preview-api.asc.so", {
+      expect(registerConsumer).toHaveBeenCalledWith("https://api.preview.asc.so", {
         name: "TestOrg",
         description: "TestOrg consumer",
         contactEmail: "test@example.com",
