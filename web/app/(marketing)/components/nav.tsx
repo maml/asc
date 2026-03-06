@@ -32,11 +32,11 @@ export function Nav() {
     >
       <div className="mx-auto max-w-[1200px] flex items-center justify-between px-6 h-14">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2">
+        <a href="/" className="flex items-center gap-2">
           <span className="font-mono text-xs font-bold tracking-widest uppercase text-light">
             ASC
           </span>
-        </Link>
+        </a>
 
         {/* Desktop nav */}
         <div className="hidden lg:flex items-center gap-6">
