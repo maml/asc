@@ -87,8 +87,10 @@ async function main(): Promise<void> {
   const agentIds: string[] = [];
   for (const agent of agents) {
     const result = await provider.registerAgent(agent);
+    // Activate agent so it can be used in pipelines
+    await provider.updateAgent(result.id, { status: "active" } as any);
     agentIds.push(result.id);
-    console.log(`Agent: ${result.name} (${result.id})`);
+    console.log(`Agent: ${result.name} (${result.id}) — active`);
   }
 
   // Register demo consumer
