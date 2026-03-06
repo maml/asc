@@ -67,8 +67,8 @@ const capabilities = [
   },
   {
     icon: Zap,
-    title: "Lightning Settlement",
-    description: "L2-agnostic adapter pattern. Lightning via Phoenixd, noop for dev. Platform fees, reconciliation, and provider config built in.",
+    title: "Settlement",
+    description: "L2-agnostic adapter pattern. Lightning via Phoenixd, traditional payments via Stripe Connect, noop for dev. Platform fees, reconciliation, and provider config built in.",
   },
 ];
 

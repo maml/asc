@@ -96,7 +96,7 @@ export function Hero() {
             <span className="text-navy-light">·</span>
             <span>Dual auth</span>
             <span className="text-navy-light">·</span>
-            <span>Lightning settlement</span>
+            <span>Multi-network settlement</span>
           </div>
         </FadeIn>
       </div>

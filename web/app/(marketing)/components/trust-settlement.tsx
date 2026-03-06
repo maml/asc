@@ -75,9 +75,9 @@ export function TrustSettlement() {
               <li className="flex gap-2">
                 <span className="text-amber shrink-0">→</span>
                 <span>
-                  <strong className="text-light">L2-agnostic adapter pattern</strong> —
-                  Lightning via Phoenixd today. Liquid, Stripe, and custom adapters
-                  are pluggable.
+                  <strong className="text-light">Multi-network settlement</strong> —
+                  Lightning via Phoenixd, traditional payments via Stripe Connect.
+                  Custom adapters are pluggable.
                 </span>
               </li>
               <li className="flex gap-2">
