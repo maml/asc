@@ -4,3 +4,5 @@ export { registerSettlementRoutes } from "./routes.js";
 export { NoopAdapter } from "./adapters/noop.js";
 export { StrikeAdapter } from "./adapters/strike.js";
 export type { StrikeConfig } from "./adapters/strike.js";
+export { StripeAdapter } from "./adapters/stripe.js";
+export type { StripeAdapterConfig } from "./adapters/stripe.js";

@@ -40,6 +40,7 @@ import { registerSettlementRoutes } from "./settlement/routes.js";
 import { NoopAdapter } from "./settlement/adapters/noop.js";
 import { StrikeAdapter } from "./settlement/adapters/strike.js";
 import { PhoenixdAdapter } from "./settlement/adapters/phoenixd.js";
+import { StripeAdapter } from "./settlement/adapters/stripe.js";
 import type { SettlementNetwork, SettlementAdapter } from "./types/settlement.js";
 import "./auth/types.js";
 import "./crypto/types.js";
@@ -93,6 +94,9 @@ export async function buildApp(pool: pg.Pool): Promise<AppContext> {
     }));
   } else if (process.env["STRIKE_API_KEY"]) {
     settlementAdapters.set("lightning", new StrikeAdapter({ apiKey: process.env["STRIKE_API_KEY"] }));
+  }
+  if (process.env["STRIPE_SECRET_KEY"]) {
+    settlementAdapters.set("stripe", new StripeAdapter({ secretKey: process.env["STRIPE_SECRET_KEY"] }));
   }
   const settlementService = new SettlementService(settlementRepo, settlementAdapters, {
     defaultFeePercentage: 0.02,
