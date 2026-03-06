@@ -9,7 +9,9 @@ ENV NEXT_PUBLIC_API_URL=__NEXT_PUBLIC_API_URL__
 ENV NEXT_PUBLIC_WS_URL=__NEXT_PUBLIC_WS_URL__
 
 COPY . .
-RUN npm run build
+# Run next build directly — skip prebuild (collect-stats needs full monorepo).
+# stats.json is already checked in via COPY above.
+RUN npx next build
 
 # Production stage
 FROM node:20-alpine
