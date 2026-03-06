@@ -30,31 +30,33 @@ export function TrustSettlement() {
               <li className="flex gap-2">
                 <span className="text-blue shrink-0">→</span>
                 <span>
-                  <strong className="text-light">secp256k1 keypairs</strong> — same
-                  curve as Bitcoin/Ethereum. Agents own their identity, not the platform.
+                  <strong className="text-light">API keys by default</strong> — start
+                  immediately with zero setup. Every registration returns a ready-to-use
+                  API key.
                 </span>
               </li>
               <li className="flex gap-2">
                 <span className="text-blue shrink-0">→</span>
                 <span>
-                  <strong className="text-light">BIP-32 HD derivation</strong> — derive
-                  child keys for different scopes (provider auth, consumer auth, delegation)
-                  from one master key.
+                  <strong className="text-light">Optional cryptographic identity</strong> —
+                  agents can own their identity via secp256k1 keypairs (same curve as
+                  Bitcoin). Upgrade when you need zero-trust, not before.
                 </span>
               </li>
               <li className="flex gap-2">
                 <span className="text-blue shrink-0">→</span>
                 <span>
-                  <strong className="text-light">Dual auth</strong> — API keys for
-                  simplicity or cryptographic signatures for zero-trust. Both enforce
-                  route-level access guards.
+                  <strong className="text-light">Upgrade via SDK or MCP</strong> — generate
+                  a keypair, register the public key, and switch to signature auth. BIP-32
+                  HD derivation available for scoped child keys.
                 </span>
               </li>
               <li className="flex gap-2">
                 <span className="text-blue shrink-0">→</span>
                 <span>
                   <strong className="text-light">Replay protection</strong> — per-request
-                  nonce + timestamp. Platform compromise cannot impersonate agents.
+                  nonce + timestamp on signature auth. Both auth methods enforce route-level
+                  access guards.
                 </span>
               </li>
             </ul>
