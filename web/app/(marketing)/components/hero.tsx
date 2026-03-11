@@ -18,17 +18,6 @@ export function Hero() {
       <ParticleCanvas />
 
       <div className="relative mx-auto max-w-[1200px] px-6 pt-20 pb-16 text-center">
-        {/* Badge */}
-        <FadeIn>
-          <div className="inline-flex items-center gap-3 font-mono text-[11px] uppercase tracking-widest text-gray mb-8">
-            <span>Open Source</span>
-            <span className="text-navy-light">·</span>
-            <span>{stats.mcpTools} MCP Tools</span>
-            <span className="text-navy-light">·</span>
-            <span>Self-Hostable</span>
-          </div>
-        </FadeIn>
-
         {/* Headline */}
         <FadeIn delay={100}>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.1] text-light mb-6 font-mono">

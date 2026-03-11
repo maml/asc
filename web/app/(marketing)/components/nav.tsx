@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Github } from "lucide-react";
 
 const NAV_ITEMS = [
   { label: "Problem", href: "#problem" },
@@ -54,6 +54,15 @@ export function Nav() {
 
         {/* CTAs */}
         <div className="hidden lg:flex items-center gap-3">
+          <a
+            href="https://github.com/maml/asc"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-gray hover:text-light transition-colors"
+            aria-label="GitHub"
+          >
+            <Github size={16} />
+          </a>
           <Link
             href="/canvas"
             className="font-mono text-[11px] uppercase tracking-widest text-gray hover:text-light transition-colors"
@@ -91,6 +100,16 @@ export function Nav() {
               {item.label}
             </a>
           ))}
+          <a
+            href="https://github.com/maml/asc"
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => setMenuOpen(false)}
+            className="flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-gray hover:text-light"
+          >
+            <Github size={14} />
+            GitHub
+          </a>
           <Link
             href="/canvas"
             onClick={() => setMenuOpen(false)}
