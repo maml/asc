@@ -53,15 +53,15 @@ export function Nav() {
         </div>
 
         {/* CTAs */}
-        <div className="hidden lg:flex items-center gap-3">
+        <div className="hidden lg:flex items-center gap-4">
           <a
             href="https://github.com/maml/asc"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-gray hover:text-light transition-colors"
+            className="text-muted-foreground hover:text-light transition-colors"
             aria-label="GitHub"
           >
-            <Github size={16} />
+            <Github size={20} />
           </a>
           <Link
             href="/canvas"
