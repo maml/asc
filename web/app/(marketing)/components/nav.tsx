@@ -10,6 +10,7 @@ const NAV_ITEMS = [
   { label: "MCP Server", href: "#mcp" },
   { label: "Trust & Settlement", href: "#trust" },
   { label: "Get Started", href: "#get-started" },
+  { label: "Blog", href: "/blog" },
 ];
 
 export function Nav() {

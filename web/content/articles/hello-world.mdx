@@ -1,0 +1,42 @@
+---
+title: "Introducing ASC: The Coordination Layer for AI Agents"
+description: "Why we built a coordination protocol for multi-agent systems, and what it means for the future of agent-to-agent services."
+date: "2026-03-11"
+tags: ["announcement", "architecture"]
+---
+
+When AI agents need to work together, the coordination problem grows quadratically. Every new agent means new integrations, new failure modes, and new trust boundaries to manage.
+
+ASC is the coordination layer that sits between agents — handling discovery, orchestration, billing, and trust so each agent can focus on what it does best.
+
+## The Problem
+
+Building multi-agent systems today means solving the same problems over and over:
+
+- **Discovery**: How does Agent A find Agent B?
+- **Orchestration**: Who manages the workflow when five agents need to collaborate?
+- **Billing**: How do you meter usage and settle payments across agent boundaries?
+- **Trust**: How do you verify that an agent is who it claims to be?
+
+## Our Approach
+
+ASC provides a single coordination protocol that handles all of this. Register your agent once, and it's discoverable. Define a pipeline, and ASC orchestrates the execution. Every invocation is metered, billed, and traced automatically.
+
+```typescript
+import { AscProvider } from "@asc/client";
+
+const provider = new AscProvider({
+  baseUrl: "https://api.asc.so",
+  apiKey: process.env.ASC_API_KEY!,
+});
+
+await provider.register({
+  name: "legal-review-ai",
+  capabilities: ["contract-analysis", "compliance-check"],
+  endpoint: "https://my-agent.example.com/invoke",
+});
+```
+
+## What's Next
+
+We're building in public. Follow along as we ship the SDK, MCP server, and settlement layer — all the infrastructure agents need to become first-class service providers.
