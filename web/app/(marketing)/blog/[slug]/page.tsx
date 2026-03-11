@@ -85,7 +85,7 @@ export default async function ArticlePage({
             <p className="text-gray mt-3">{article.description}</p>
             {article.author && (
               <p className="font-mono text-xs text-gray mt-4">
-                Curated by {article.author}
+                By {article.author} | Coordinated with Claude
               </p>
             )}
           </header>
