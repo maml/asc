@@ -1,0 +1,271 @@
+---
+title: "The Coordination Gap: Why Nobody Is Managing Agents Across Organizations"
+meta_description: "Agent orchestration tools are everywhere. Agent coordination infrastructure is nowhere. Here's why that distinction matters and what the data says about it."
+primary_keyword: "cross-organizational agent coordination"
+secondary_keywords:
+  - "agent coordination layer"
+  - "agent sprawl"
+  - "multi-agent coordination"
+  - "AI agent infrastructure"
+  - "agent services economy"
+content_type: "pillar-guide"
+search_intent: "informational"
+actual_word_count: 3350
+author: "Matt Loseke"
+date_created: "2026-02-23"
+last_updated: "2026-03-11"
+status: "draft"
+series: "The Coordination Gap"
+series_order: 1
+schema_article: |
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "The Coordination Gap: Why Nobody Is Managing Agents Across Organizations",
+    "description": "Agent orchestration tools are everywhere. Agent coordination infrastructure is nowhere. Here's why that distinction matters and what the data says about it.",
+    "author": {
+      "@type": "Person",
+      "name": "Matt Loseke"
+    },
+    "datePublished": "2026-02-23",
+    "dateModified": "2026-03-11",
+    "publisher": {
+      "@type": "Organization",
+      "name": "ASC"
+    },
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "URL_PLACEHOLDER"
+    },
+    "keywords": ["cross-organizational agent coordination", "agent coordination layer", "agent sprawl", "multi-agent coordination", "AI agent infrastructure"]
+  }
+---
+
+# The Coordination Gap: Why Nobody Is Managing Agents Across Organizations
+
+*The AI agent space is repeating a pattern that has played out four times before. This is what I'm noticing, what the data says, and why it matters if you're building anything with agents that cross an organizational boundary.*
+
+---
+
+Every infrastructure category in the last twenty years followed the same script. A new coordination problem appears. Companies build custom solutions. 60-70% of engineering effort goes to plumbing instead of business logic. Someone builds a coordination layer that absorbs the complexity. The market consolidates around it.
+
+Payments. Communications. Financial data. Cloud monitoring.
+
+Agent services are next. And right now, nobody is building the coordination layer.
+
+This piece explains what the coordination gap is, why it is different from orchestration, where it shows up in production, what existing tools miss, and what comes next.
+
+## The pattern you've seen before
+
+In 2010, accepting a payment on the internet meant negotiating with payment processors, building PCI-compliant infrastructure, and maintaining integrations with banks. A startup could spend months on payment plumbing before writing a line of business logic.
+
+Stripe replaced that with seven lines of code.
+
+Stripe did not make payments easy because payments are easy. Stripe made payments easy because they absorbed the complexity into a coordination layer that sat between merchants and financial infrastructure. Today, Stripe is valued at roughly $70 billion.
+
+Twilio did the same thing for communications. Before Twilio, adding voice or SMS to an application meant negotiating with telecom carriers, provisioning phone numbers, and building custom telephony infrastructure. Twilio created the Communications Platform as a Service (CPaaS) category. The category did not exist before Twilio named it.
+
+Plaid did it for financial data. A neutral middleware layer that connected applications to bank accounts without requiring each application to build its own banking integrations.
+
+Datadog did it for cloud monitoring. Before Datadog, observability meant stitching together Nagios, StatsD, Graphite, and custom dashboards. Every ops team was building their own monitoring stack. Datadog built the observability layer and created a category around it.
+
+And just last month, Temporal raised $300 million in its Series D specifically to build infrastructure for agentic AI workflows. The investment community recognizes that coordination infrastructure is where the value accrues.
+
+The pattern is always the same:
+
+1. A coordination problem emerges from growing ecosystem complexity.
+2. Every company builds their own solution from scratch.
+3. Engineering effort concentrates on infrastructure instead of differentiation.
+4. Someone builds a shared coordination layer that absorbs the complexity.
+5. The coordination layer captures most of the value.
+
+First-movers in category naming capture approximately 76% of the category's market capitalization. The company that names the problem owns the frame.
+
+Right now, the agent services economy is stuck at step two. Every company building multi-agent systems is rebuilding the same coordination infrastructure from scratch.
+
+## What is the coordination gap?
+
+Here is the simplest way I can describe it.
+
+Every platform, framework, and tool in the AI agent space coordinates agents inside one organization. CrewAI coordinates agent teams within your system. LangGraph orchestrates workflows within your application. ServiceNow manages agents within the ServiceNow ecosystem. Salesforce Agentforce manages agents within the Salesforce ecosystem.
+
+Nobody coordinates agents across organizational boundaries.
+
+That is the coordination gap.
+
+When your research agent needs to hand off to your coding agent and something fails, you have a debugging problem. When your agent needs to hand off to a different company's agent and something fails, you have a trust problem, a billing problem, an SLA problem, and a debugging problem. All at once. With no shared infrastructure to help you resolve any of them.
+
+The coordination gap is the space between organizations where agent-to-agent service delivery has no infrastructure, no standards, no quality enforcement, and no governance. It is the missing layer in the AI agent stack.
+
+Enterprises average 12 agents today. That number is projected to grow 67% within two years. The coordination wall — the point where agent sprawl creates more complexity than value — hits at 5-10 agents within a single organization. Now multiply that across organizational boundaries.
+
+More than 80% of IT leaders say agent sprawl already creates more complexity than value. And that is just the intra-organizational picture. Cross-organizational agent coordination barely exists yet.
+
+Gartner saw a 1,445% surge in multi-agent system inquiries from Q1 2024 to Q2 2025. The demand is not growing linearly. It is growing exponentially. And the infrastructure to support it does not exist.
+
+## Why cross-org coordination is different from orchestration
+
+This is the distinction that almost nobody is making. And it matters.
+
+**Orchestration** is arranging agents to work together within a single system. You control all the agents. You control the data. You control the trust model. You write the workflows, define the handoffs, and handle the errors. Orchestration is hard, but it is a solved-category problem. Tools exist. Frameworks exist. Patterns exist.
+
+**Coordination** is making agents work together across trust boundaries, across billing relationships, across SLAs, across governance frameworks, and across organizations that do not share a codebase, a data model, or a deployment environment.
+
+Here is what changes when you cross the organizational boundary:
+
+**Trust** — Orchestration: implicit, you own all agents. Coordination: must be established, verified, maintained.
+
+**Billing** — Orchestration: internal cost allocation. Coordination: real money, real invoices, usage-based.
+
+**SLAs** — Orchestration: informal or internal targets. Coordination: contractual, with penalties.
+
+**Quality** — Orchestration: you define and enforce. Coordination: negotiated, independently validated.
+
+**Governance** — Orchestration: your policies, your audit trail. Coordination: multi-party compliance, shared audit.
+
+**Error handling** — Orchestration: debug your own code. Coordination: assign responsibility across parties.
+
+**Visibility** — Orchestration: full observability stack. Coordination: partial, bounded by trust agreements.
+
+**Handoffs** — Orchestration: in-process or in-cluster. Coordination: across networks, APIs, and legal entities.
+
+Orchestration is a software engineering problem. Coordination is a software engineering problem plus a business relationship problem plus a governance problem plus a trust problem. That is why the existing tools, which are excellent at orchestration, do not cover the coordination gap.
+
+The math is instructive. Communication complexity between agents grows exponentially. Ten agents within one organization create 45 potential relationships. Ten agents across five organizations create 45 potential relationships, each crossing a trust boundary, a billing boundary, and a governance boundary. The complexity is not additive. It is multiplicative.
+
+## Where the gap shows up
+
+The coordination gap is not theoretical. It shows up in specific, measurable ways.
+
+**Handoff failures.** On complex multi-agent tasks, handoffs fail 70% of the time. Within a single organization, that means retries, fallback logic, and late-night debugging sessions. The blast radius is contained. You control both sides.
+
+Across organizations, the picture changes completely. A failed handoff becomes a finger-pointing exercise between two companies with different logging systems, different error taxonomies, and different definitions of "the agent did what it was supposed to do." SLA disputes follow. Revenue gets lost in the gap between "we sent the response" and "we never received it."
+
+One logistics company documented a $2 million loss from a loop of uncoordinated agents. Agents from different providers repeatedly triggered each other's workflows — each one responding to the other's output, generating new requests, consuming tokens, executing actions. No circuit breaker. No cost cap. No cross-org visibility into what was happening. By the time a human noticed, the damage was done.
+
+**The coordination tax.** Engineering teams building multi-agent systems spend 60-70% of their effort on coordination infrastructure rather than business logic. Routing logic. Handoff protocols. Error handling. Retry policies. Observability pipelines. Billing integration. Authentication flows across organizational boundaries. None of that is their core product. None of it creates competitive differentiation. But all of it is necessary before a single agent can do useful work across an organizational boundary.
+
+One practitioner's summary: "Orchestration overhead is eating 80% of dev time." On Reddit, a post about the pain of connecting agents across systems got 287 upvotes. The top response named it perfectly: integration hell.
+
+Every hour your engineering team spends building coordination plumbing is an hour they are not spending on the agent capabilities that actually differentiate your business. That is not a competitive advantage. That is a tax.
+
+**Token cost multiplication.** Poor coordination inflates token costs 3.5x above what is necessary. Agents repeat work because they don't know another agent already completed the task. Agents pass entire conversation histories as context because there is no structured context-sharing protocol across organizations. Agents call other agents without understanding the cost implications because there is no metering layer at the organizational boundary.
+
+Within a single organization, you can optimize this. You can build shared context stores, implement caching layers, design efficient handoff formats. Across organizations, you need coordination infrastructure to do any of that. Without it, every cross-org interaction is maximally wasteful.
+
+**The DIY failure rate.** MIT's NANDA research program found that custom-built agent coordination solutions succeed 22% of the time. Purchased solutions succeed 67% of the time. The data is not ambiguous. Most organizations should not be building coordination infrastructure from scratch.
+
+And yet, 40% of enterprises report that custom integration code is their primary approach to agent coordination. They are choosing the path that fails 78% of the time. Not because they are making an uninformed decision — most engineering teams genuinely believe they can build coordination infrastructure faster and better than they can buy it. The problem is scope. Cross-org coordination is not one problem. It is eight problems (routing, handoffs, SLAs, quality, billing, observability, trust, governance) that all need to work together. Solving any one of them is straightforward. Solving all eight in production, across trust boundaries, at scale — that is where the 22% success rate comes from.
+
+Gartner projects that 40% of agentic AI projects will be scrapped by 2027 due to operationalization failures. The coordination gap is a primary driver. It is not that the agents don't work. It is that the agents don't work together across the boundaries that matter.
+
+## What existing tools miss
+
+The agent infrastructure space is growing fast. CrewAI sees 1.38 million monthly downloads. LangGraph sees 6.17 million. ServiceNow generated $3.47 billion in Q4 subscription revenue. These are not small players, and they are not building bad products.
+
+But every single one of them optimizes for single-organization orchestration.
+
+**CrewAI** is excellent for building internal agent teams with role-based collaboration. It raised $18 million in its Series A. If you need three agents working together within your application, CrewAI is a strong choice. It was not designed for coordinating agents across organizational boundaries.
+
+**LangGraph** is a powerful framework for building graph-based agent workflows. Six million monthly downloads speak for themselves. If you need complex, stateful workflows within your system, LangGraph delivers. It was not designed for cross-org coordination.
+
+**ServiceNow** and **Salesforce Agentforce** bring agent capabilities to massive enterprise ecosystems. Salesforce has added MCP and A2A support, plus an AgentExchange marketplace. ServiceNow positions as an AI control tower. But both are ecosystem-locked. If your coordination needs extend beyond one vendor's boundaries, you hit the wall.
+
+And then there are the protocols.
+
+**MCP** (Model Context Protocol, from Anthropic) handles tool connectivity. It gives agents a standard way to connect to tools and data sources. It does not handle billing, SLAs, quality enforcement, or governance across organizations.
+
+**A2A** (Agent-to-Agent, now under the Linux Foundation) handles agent-to-agent communication. It gives agents a standard way to discover and talk to each other. It does not handle billing, SLAs, quality enforcement, or governance across organizations.
+
+**ACP** (Agent Communication Protocol, from IBM/BeeAI) is the newest entrant — an event-driven protocol for agent interaction. It does not handle billing, SLAs, quality enforcement, or governance across organizations.
+
+Three competing protocols. None of them addresses the coordination gap.
+
+In fact, three competing protocols means more fragmentation, which increases the need for a coordination layer, not less. Someone has to sit between these protocols and provide the cross-organizational infrastructure that none of them were designed to offer: routing, handoffs, SLAs, quality gates, billing, observability, trust, and governance.
+
+76% of enterprises report active concerns about vendor lock-in. 67% explicitly aim to avoid dependency on a single AI provider. The coordination layer cannot belong to any one ecosystem. It has to be neutral infrastructure, the way Stripe is neutral across banks and Plaid is neutral across financial institutions.
+
+## What the coordination layer needs to look like
+
+If the coordination gap is the problem, what does the solution look like?
+
+Based on the infrastructure patterns that have played out before — and the specific failure modes showing up in cross-organizational agent deployments — the coordination layer needs to handle at least eight capabilities across organizational boundaries.
+
+**Routing.** When an agent needs a service from another organization's agent, something has to route that request to the right provider, with the right capabilities, at the right price point. This is not service discovery — A2A can handle basic discovery. This is intelligent routing with cost awareness, quality history, SLA matching, and fallback options. Think of it as DNS for agent services, but with a pricing table and a reputation score attached.
+
+**Handoffs.** Structured handoffs with context preservation, error handling, and fallback logic — across trust boundaries. When a handoff fails at the organizational boundary, the coordination layer needs to know who is responsible, what context to preserve, what to retry, and when to circuit-break. A handoff is not just passing data. It is transferring responsibility.
+
+**SLAs.** Contractual service level agreements between organizations, enforced programmatically. Response time guarantees. Uptime commitments. Quality thresholds. Penalty clauses. Not informal internal targets. Real SLAs with real money behind them.
+
+**Quality gates.** Validation that an agent's output meets the receiving organization's quality standards before the handoff completes. This is the production-grade equivalent of code review, but for agent outputs crossing trust boundaries.
+
+**Billing.** Usage-based billing between organizations for agent services. Metering. Invoicing. Cost allocation. Dispute resolution. This is what Stripe built for payments, applied to agent-to-agent service delivery.
+
+**Observability.** Cross-organizational visibility into agent interactions — without exposing either party's internal systems. Enough transparency to debug problems and optimize performance. Enough privacy to protect proprietary processes.
+
+**Trust.** Agent identity, capability verification, and reputation across organizational boundaries. When your agent calls another organization's agent, how do you know it will do what it claims? How do you know it is actually that organization's agent and not a malicious impersonator?
+
+**Governance.** Cross-organizational audit trails, compliance reporting, and policy enforcement. 80% of organizations report risky agent behaviors. Only 21% have mature governance frameworks. And that is within a single organization. Cross-org governance is harder by an order of magnitude because no single party has complete visibility or complete authority.
+
+No single tool, framework, or protocol provides all eight. That is not a criticism — protocols are supposed to be narrow. The coordination layer is the infrastructure that connects the protocols to the business reality of cross-organizational agent service delivery.
+
+## The market is moving — fast
+
+The numbers tell the story.
+
+The AI agent market is valued at $7.84 billion in 2025. MarketsandMarkets projects it will reach $52.62 billion by 2030. That is not incremental growth. That is an infrastructure category forming in real time.
+
+Gartner saw a 1,445% surge in multi-agent system inquiries from Q1 2024 to Q2 2025. Enterprise interest is not gradual. It is exponential.
+
+74% of enterprises are actively scrambling to figure out orchestration, according to Salesforce's 2026 Connectivity Benchmark. They have agents. They have plans for more agents. They do not have coordination infrastructure.
+
+Goldman Sachs projects that 90% of B2B buying will be AI-agent intermediated by 2028, representing $15 trillion or more in transactions. Agents from different companies will negotiate, transact, and deliver services to other agents from other companies. Without cross-organizational coordination infrastructure, that market cannot function.
+
+And the regulatory clock is ticking.
+
+The EU AI Act begins enforcement on August 2, 2026. Penalties reach up to 35 million EUR or 7% of global annual turnover, whichever is higher. Every enterprise deploying AI agents across organizational boundaries will need cross-org audit trails, governance, and accountability infrastructure.
+
+In the United States, NIST launched its AI Agent Standards Initiative in February 2026. The regulatory framework is forming. The question is not whether cross-organizational agent governance will be required. The question is whether organizations will have the infrastructure to comply.
+
+But here is the number that should keep people up at night: Gartner projects that 40% of agentic AI projects will be scrapped by 2027 due to operationalization failures. Not because the agents are bad. Because the coordination infrastructure does not exist.
+
+## What to do about it
+
+If you are running an engineering organization with agents in production, or planning to deploy agents that will interact across organizational boundaries, here is a framework for assessing your coordination maturity.
+
+**Level 0: No coordination.**
+You have agents, but each operates independently. No structured handoffs. No cross-org visibility. No SLAs. This is where most organizations start.
+
+**Level 1: Ad hoc coordination.**
+You have built custom integrations between some agents, possibly across some organizational boundaries. It works for specific use cases but does not generalize. The coordination tax is high. You are in the 60-70% engineering effort range.
+
+**Level 2: Standardized protocols.**
+You have adopted MCP for tool connectivity and possibly A2A for agent communication. Your intra-org coordination is solid. But cross-org coordination still relies on custom code, and you have no cross-org billing, SLAs, or governance.
+
+**Level 3: Managed coordination.**
+You have a coordination layer that handles routing, handoffs, quality gates, and observability across organizational boundaries. SLAs are programmatic. Billing is usage-based. Trust is verified, not assumed.
+
+**Level 4: Governed coordination.**
+Everything in Level 3, plus cross-organizational governance, compliance automation, and audit trails that satisfy regulatory requirements. You are ready for EU AI Act enforcement and whatever comes after.
+
+Most organizations are at Level 0 or Level 1 today. A few are reaching Level 2. Almost nobody is at Level 3 or Level 4. That is the gap. That is the opportunity.
+
+The organizations that reach Level 3 and Level 4 first will define the agent services economy. They will set the standards. They will establish the pricing models. They will build the trust networks. The organizations that stay at Level 0 will join the 40% of agentic AI projects that get scrapped.
+
+**Ask yourself three questions:**
+
+1. How many of your agent interactions cross organizational boundaries today? How many will cross them in 12 months?
+2. What percentage of your engineering effort goes to coordination infrastructure versus business logic?
+3. If a cross-org agent handoff fails at 2 AM on a Friday, who is responsible?
+
+If you don't have clear answers, you're not alone. 74% of enterprises don't either.
+
+The coordination gap is the defining infrastructure challenge of the agent services economy. It has been solved before — in payments, in communications, in financial data, in cloud monitoring. The pattern is clear. The infrastructure always wins.
+
+The only question is who builds the coordination layer.
+
+---
+
+*I write about the coordination gap every week — the infrastructure, protocols, and market developments shaping cross-organizational agent coordination. No hype. No sales pitches. Just signal in a noisy market.*
+
+*Subscribe to [The Coordination Gap](https://thecoordinationgap.beehiiv.com) newsletter.*
