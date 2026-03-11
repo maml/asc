@@ -1,0 +1,446 @@
+---
+title: "I Built a Production Coordination Platform with Claude Code. Here's What Actually Happened."
+meta_description: "480+ tests, 21 database tables, crypto identity, settlement layers. What happens when you use Claude Code to build real infrastructure, not another task manager."
+primary_keyword: "building production app with claude code"
+secondary_keywords:
+  - "claude code production"
+  - "vibe coding production infrastructure"
+  - "claude code sub-agents"
+  - "AI coding agent architecture"
+  - "claude code large codebase"
+  - "building with claude code"
+content_type: "case-study"
+search_intent: "informational"
+target_word_count: 4000
+actual_word_count: 4450
+author: "Matt Loseke"
+date_created: "2026-03-11"
+last_updated: "2026-03-11"
+status: "draft"
+serp_snapshot_date: "2026-03-11"
+paa_questions_answered: 8
+schema_article: |
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "I Built a Production Coordination Platform with Claude Code. Here's What Actually Happened.",
+    "description": "480+ tests, 21 database tables, crypto identity, settlement layers. What happens when you use Claude Code to build real infrastructure, not another task manager.",
+    "author": {
+      "@type": "Person",
+      "name": "Matt Loseke"
+    },
+    "datePublished": "2026-03-11",
+    "dateModified": "2026-03-11",
+    "publisher": {
+      "@type": "Organization",
+      "name": "ASC"
+    },
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "URL_PLACEHOLDER"
+    },
+    "keywords": ["building production app with claude code", "claude code production", "vibe coding production infrastructure", "claude code sub-agents", "AI coding agent architecture"]
+  }
+schema_faq: |
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Can you build a production app with Claude Code?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, but production-grade results require treating Claude Code as a contractor, not a magic wand. The key is architectural discipline: CLAUDE.md files that enforce design philosophy, sub-agents for parallel work, and human oversight on structural decisions. ASC shipped with 480+ tests, 21 database tables, crypto identity, and settlement infrastructure — all built with Claude Code."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How do you use Claude Code sub-agents for large projects?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Sub-agents work best when you use them like a development team: one agent explores existing patterns, another reads docs or tests, then you synthesize before writing. For ASC, parallel sub-agents handled exploration, implementation, and verification simultaneously — cutting build time significantly while maintaining architectural coherence across 15+ type files."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Does vibe coding work for complex infrastructure projects?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Not the way most people do it. Pure 'vibe coding' — describing what you want and hoping for the best — falls apart past a few thousand lines. What works is treating the AI agent as a senior contractor: you own the architecture, enforce patterns through CLAUDE.md, and use sub-agents to parallelize independent work. The human remains the architect; the agent handles implementation velocity."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is CLAUDE.md and why does it matter?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "CLAUDE.md is a project instruction file that Claude Code reads at the start of every session. It defines your coding standards, architecture decisions, file structure conventions, and testing requirements. Without it, Claude makes independent decisions that drift from your design philosophy. With it, you get consistent patterns across hundreds of files."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How does Claude Code compare to Cursor for large projects?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Claude Code operates as an autonomous terminal agent — it reads files, runs commands, executes tests, and manages git. Cursor is an IDE-integrated assistant. For large infrastructure projects, Claude Code's sub-agent architecture and terminal-native operation made it better suited for parallel work across multiple modules. The trade-off is less visual feedback during implementation."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can AI coding agents handle large codebases?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "They can, but the approach changes. At scale, you cannot dump the entire codebase into context. Instead, you use sub-agents to explore specific modules, maintain strict CLAUDE.md files that encode architecture decisions, and keep files small and focused. ASC's codebase spans 15+ type files, 21 database tables, and 480+ tests — coherence comes from encoded patterns, not raw context."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What are the limitations of building with AI coding agents?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Three main limitations: (1) Non-deterministic behavior — same prompt, different architectural decisions. You must verify every structural choice. (2) Context drift — agents can 'forget' established patterns at scale. CLAUDE.md files mitigate but don't eliminate this. (3) The agent cannot own your architecture. It can implement patterns flawlessly, but the human must define what those patterns are."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How to maintain architectural coherence with AI-generated code?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Four practices that worked for ASC: (1) Branded types for compile-time safety — if it compiles, the types are correct. (2) CLAUDE.md encoding design philosophy, not just coding standards. (3) Sub-agents for verification — spawn a review agent after every implementation. (4) Small, focused files — bounded context means the agent can understand the full module without losing the thread."
+        }
+      }
+    ]
+  }
+---
+
+# I Built a Production Coordination Platform with Claude Code. Here's What Actually Happened.
+
+Every "I built X with AI" post follows the same script. Someone builds a task manager, a landing page, maybe a simple SaaS app. They show the prompts. They show the output. They declare the future is here.
+
+I built something different. A multi-service coordination platform with secp256k1 crypto identity, Lightning Network settlement, circuit breakers, SLA enforcement, and 480+ tests running against real Postgres. Not a weekend hack. Production infrastructure.
+
+And I built it with Claude Code.
+
+This is the honest account of what that looks like — the patterns that worked, the failures that didn't make the demo reel, and why "vibe coding" is the wrong frame for serious infrastructure work.
+
+## The Numbers First
+
+Before the narrative, the receipts:
+
+- **322 backend tests** across 31 files (Vitest, real Postgres)
+- **69 SDK unit tests** across 4 files
+- **89 MCP server tests** across 8 files
+- **480+ total tests**, all passing
+- **21 database tables**, 8 migrations
+- **44 MCP tools** across 6 domains
+- **secp256k1 crypto identity** with BIP-32 HD key derivation
+- **L2-agnostic settlement** (Lightning/Strike + noop fallback)
+- **Full Next.js frontend**: 12 pages, zero mocks, live topology canvas
+- **Client SDK**: `@asc/client` with dual-auth (API key + secp256k1 signing)
+- **MCP server**: `@asc/mcp-server`, 44 tools, stdio transport
+- **Deployment**: Render (backend) + Vercel (frontend) + Neon (Postgres)
+- **CI**: 4 parallel GitHub Actions jobs
+
+The project is called ASC — the Agentic Services Coordinator. It is a coordination layer for AI agent services across organizational boundaries. Think: what happens when your agent needs to hire another company's agent, pay for the work, verify quality, and enforce SLAs. That infrastructure.
+
+FSL-1.1-MIT licensed. Open source. The codebase is real, the tests run, and you can read every line.
+
+## Why This Is Different from Every Other "Built with AI" Post
+
+Most AI-built projects fall into predictable buckets:
+
+- **Simple CRUD apps** — task managers, todo lists, note-taking apps. Impressive at demo speed, unremarkable in production.
+- **Cursor/Copilot-assisted projects** — typically 50-70% LLM-generated with heavy human steering on every file. The human is still writing most of the architecture.
+- **Devin-style demos** — narrow scope. Fix a bug, build a small feature, submit a PR. Not system-level thinking.
+
+ASC has none of these limitations. It has coherent architecture at scale. Fifteen-plus type files with branded types for compile-time safety. Layers that compose properly. Consistent patterns from the database layer through the HTTP handlers through the SDK through the MCP server.
+
+And it uses real software design patterns — not because Claude decided to, but because the architecture demanded them. Adapter pattern for settlement (four payment network implementations behind one interface). Repository pattern for storage abstraction. Strategy pattern for pricing models. Circuit breakers for fault tolerance. Dependency injection throughout. These aren't patterns you sprinkle on for credibility. They're patterns that emerge when you're solving actual infrastructure problems at scale.
+
+The hard part was never generating code. The hard part was maintaining design philosophy at scale.
+
+## Can You Build a Production App with Claude Code?
+
+Yes. But the word "production" is doing a lot of work in that sentence.
+
+If production means "deployed and serving traffic" — then plenty of AI-built apps qualify. If production means "would survive a security audit, handle concurrent users, maintain architectural coherence across 15+ modules, and pass 480 tests against a real database" — that's a different bar.
+
+Here's what it took to hit that bar.
+
+## The Sub-Agent Pattern: How I Actually Built It
+
+The single biggest productivity multiplier was not Claude Code itself. It was the sub-agent pattern.
+
+Here's the workflow that emerged after a few weeks of iteration:
+
+**Step 1: Explore in parallel.** Before touching any code, I'd spawn sub-agents to read and understand each affected module simultaneously. One agent explores the existing type patterns. Another reads the test files. A third checks the database schema. They all report back summaries.
+
+**Step 2: Synthesize.** I read the summaries and made the architectural decision. Not Claude. Me. The agent doesn't see the whole system the way I do. It sees the files it was asked to read. The synthesis — "this new feature should follow the TaskRouter pattern, not the ProviderRegistry pattern, because of X" — that's the human job.
+
+**Step 3: Implement with bounded scope.** One sub-agent per logical unit of work. Build the database migration. Build the type definitions. Build the service layer. Build the tests. Each agent gets a focused, specific task with clear constraints from `CLAUDE.md`.
+
+**Step 4: Verify.** Spawn a verification agent to review the changes, run tests, and check for inconsistencies with established patterns.
+
+This is not "vibe coding." This is project management with an extremely fast contractor.
+
+## The CLAUDE.md File That Made Everything Work
+
+Every article about Claude Code mentions `CLAUDE.md`. Most treat it like a style guide — tabs vs spaces, naming conventions, import order.
+
+That's underselling it by an order of magnitude.
+
+My `CLAUDE.md` encoded design philosophy:
+
+```
+- Every function should do one thing
+- Prefer standard library over clever abstractions
+- Group by feature, not by type (e.g., /auth/ not /controllers/)
+- Keep files small and focused — this helps sub-agents
+  work with bounded context
+- Flat over nested — avoid deep directory trees
+```
+
+But the real power was in the architecture decisions section:
+
+```
+- Money is stored in cents (Stripe pattern)
+- Task I/O uses `unknown` with runtime JSON Schema validation
+- PricingSnapshot is frozen at billing time
+- Provider interface = 3 endpoints (capabilities, execute, status)
+- All branded types use compile-time enforcement
+```
+
+Without these constraints, Claude made reasonable but inconsistent decisions. It would store money as floats in one module and integers in another. It would put types in the service file here and in a separate types file there. Not wrong, exactly. Just divergent.
+
+With `CLAUDE.md`, every agent session started from the same foundation. The result was architectural coherence across a codebase that no single context window could hold.
+
+## Does Vibe Coding Work for Complex Infrastructure?
+
+No. And I think the framing is actively harmful.
+
+"Vibe coding" — describe what you want, let the AI figure it out — works for prototypes. It works for landing pages. It works for the first 2,000 lines of a new project when the architecture is simple enough to fit in one context window.
+
+It stops working the moment you need:
+
+- **Consistent type patterns** across modules that can't all be loaded at once
+- **Database migrations** that need to account for existing data
+- **Security primitives** like cryptographic identity where a wrong choice is catastrophic
+- **Settlement infrastructure** where money moves and "close enough" isn't
+- **Test suites** that exercise real infrastructure (not mocked-out happy paths)
+
+Thoughtworks ran three experiments asking whether vibe coding produces production-grade software. Their conclusion: "Not consistently — not yet." They tested on a System Update Planner. Mid-complexity. Not simple, but not infrastructure.
+
+ASC is the counter-evidence — but only because I didn't vibe code it. I architected it and used Claude Code to implement the architecture at speed.
+
+The distinction matters. The human is the architect. The agent is the contractor. Reverse those roles and you get the 100K-line codebases where people report that "AI productivity gains tank as the codebase grows."
+
+## Six Architecture Decisions That AI Couldn't Make
+
+These are the decisions that shaped the system. Claude implemented all of them flawlessly once told what to do. But it did not — could not — arrive at them independently.
+
+### 1. Money in Cents
+
+Storing monetary values as integers (cents) instead of floats. This is the Stripe pattern. It eliminates floating-point rounding errors across the entire billing pipeline. Claude would have used floats in some modules and integers in others if left to its own judgment. This needed to be a systemic decision enforced everywhere.
+
+### 2. `unknown` for Task I/O
+
+Agent tasks accept and return `unknown` types with runtime JSON Schema validation. Not `any` (no type checking). Not a generic (over-constrained for a coordination platform that handles arbitrary agent capabilities). The `unknown` + runtime validation pattern gives you type safety at compile time and flexibility at runtime. That's a nuanced trade-off that requires understanding the full system.
+
+### 3. PricingSnapshot Frozen at Billing Time
+
+When a task is created, the current pricing is snapshotted and attached to the task. If the provider changes their pricing mid-task, the original price applies. This prevents billing disputes and makes the financial ledger deterministic. It's an infrastructure pattern borrowed from invoicing systems. Claude doesn't know your billing philosophy.
+
+### 4. The Provider Interface = 3 Endpoints
+
+Every provider, regardless of what their agents do, exposes exactly three endpoints: capabilities, execute, and status. This constraint makes the routing layer possible. Without it, every provider integration is a snowflake. This was a design decision driven by understanding what coordination infrastructure needs to look like at scale — not by reading any individual file.
+
+### 5. The Adapter Pattern for Settlement
+
+ASC supports four settlement networks: Stripe Connect for traditional invoicing, Strike for Lightning Network payments, Phoenixd for self-hosted Lightning, and a noop adapter for development. All four implement the same `SettlementAdapter` interface — three methods: `settle()`, `checkStatus()`, `validateConfig()`.
+
+Here's the actual interface. Three methods. That's all a settlement network needs to expose:
+
+```typescript
+// src/types/settlement.ts
+export interface SettlementAdapter {
+  settle(request: SettlementRequest): Promise<SettlementResult>;
+  checkStatus(externalId: string): Promise<SettlementResult>;
+  validateConfig(config: ProviderSettlementConfig): Promise<{ valid: boolean; error?: string }>;
+}
+```
+
+And here's how the settlement service resolves which adapter to use at runtime — one lookup, no conditionals:
+
+```typescript
+// src/settlement/service.ts
+const adapter = this.adapters.get(config.network);
+if (!adapter) {
+  await this.repo.updateSettlement(settlement.id, {
+    status: "failed",
+    error: `No adapter for network: ${config.network}`,
+    attemptCount: 1,
+    lastAttemptAt: new Date().toISOString(),
+  });
+  return this.repo.getById(settlement.id) as Promise<Settlement>;
+}
+```
+
+This is the adapter pattern, and it's not decorative. Without it, the billing service would need to know about Stripe APIs, Lightning invoices, and HTTP endpoints for phoenixd simultaneously. With it, the billing service calls `settle()` and doesn't care what network handles the money. Adding a fifth settlement network means writing one file that implements three methods. Nothing else changes.
+
+Claude implemented each adapter correctly once given the interface. But the decision to use the adapter pattern here — to define that interface, to keep settlement network knowledge out of the billing layer, to make the system extensible without modification — that's an architectural decision informed by seeing how Stripe itself handles payment method abstraction.
+
+### 6. secp256k1 for Identity, Not OAuth
+
+Organizations generate their own keypairs. No certificate authority. No shared secrets. ASC attests to relationships, not identities. This means ASC compromise can deny service but cannot impersonate organizations. That's a trust model decision that requires understanding cryptographic identity, PKI limitations, and the specific requirements of cross-organizational agent coordination.
+
+None of these decisions emerged from a prompt. All of them were implemented by Claude Code quickly, correctly, and consistently — once specified.
+
+## How to Use Claude Code Sub-Agents for Real Projects
+
+Sub-agents are documented but underused. Most people treat Claude Code as a single-threaded assistant. That's like hiring a general contractor and having them do one task at a time.
+
+Here's the pattern that worked for ASC:
+
+**Exploration sub-agents** (read-only, fast):
+- "Read the database schema and summarize the table relationships"
+- "Find all uses of the `TaskRouter` pattern and document how it works"
+- "Check the test coverage for the settlement module"
+
+**Implementation sub-agents** (write, focused):
+- "Add the `quality_gate` table following the migration pattern in `migrations/`"
+- "Implement the `QualityGateService` following the pattern in `TaskService`"
+- "Write tests for `QualityGateService` following the test patterns in `task.test.ts`"
+
+**Verification sub-agents** (read + run, critical):
+- "Run the full test suite and report any failures"
+- "Review the new files against the architecture patterns in CLAUDE.md"
+- "Check for type inconsistencies between the new service and existing types"
+
+The key insight: sub-agents preserve your main context. Instead of Claude churning through thousands of tokens reading files in your primary session, sub-agents do the exploration in their own context window and return a summary. Your main session stays clean for decision-making.
+
+## How to Maintain Architecture with AI Coding Tools
+
+Four practices that kept ASC coherent:
+
+**Branded types.** If it compiles, the types are correct. `OrgId` is not `string` — it's a branded type that only the `createOrgId()` factory can produce. Claude respects type systems. Use them to encode your constraints.
+
+Here's what that looks like in practice — 15 domain types, zero runtime cost, full compile-time safety:
+
+```typescript
+// src/types/brand.ts
+declare const __brand: unique symbol;
+type Brand<T, B extends string> = T & { readonly [__brand]: B };
+
+export type ProviderId = Brand<string, "ProviderId">;
+export type AgentId = Brand<string, "AgentId">;
+export type ConsumerId = Brand<string, "ConsumerId">;
+export type CoordinationId = Brand<string, "CoordinationId">;
+export type TaskId = Brand<string, "TaskId">;
+export type SettlementId = Brand<string, "SettlementId">;
+export type OrgId = Brand<string, "OrgId">;
+// ... 8 more branded types
+```
+
+You can't pass a `TaskId` where an `AgentId` is expected. The compiler catches it. Claude never mixed them up because the type system made it impossible.
+
+**CLAUDE.md as design philosophy, not style guide.** Don't just say "use camelCase." Say "money is cents, tasks use unknown I/O, providers expose 3 endpoints." Encode the decisions that matter architecturally.
+
+**Small, focused files.** This isn't just clean code aesthetics. Sub-agents work better with bounded context. A 200-line service file is understandable in one read. A 2,000-line god module is not — for Claude or for humans.
+
+**Dependency injection everywhere.** Every service declares its dependencies in the constructor. No hidden singletons, no global state. When Claude builds a new service, the pattern is obvious — look at any existing one:
+
+```typescript
+// src/coordination/service.ts
+export class CoordinationService {
+  constructor(
+    private coordRepo: CoordinationRepository,
+    private agentRepo: AgentRepository,
+    private providerLookup: ProviderLookup,
+    private circuitBreaker: CircuitBreakerManager,
+    private traceService?: TraceService,
+    private qualityService?: QualityService,
+    private slaService?: SlaService,
+    private billingService?: BillingService,
+  ) {}
+```
+
+Eight dependencies, all injected. Testing is trivial — pass mocks. Adding a new dependency is obvious — add a constructor parameter. Claude reproduced this pattern across every service without drift because the pattern is self-documenting.
+
+## The Failures Nobody Shows You
+
+Honesty section. These things went wrong:
+
+**Claude ignored CLAUDE.md constraints about 10% of the time.** Usually on edge cases where the "right" pattern wasn't obvious. I'd specify "money in cents" and it would still generate a float in a new utility function. The fix: verification sub-agents catch drift, but you can't skip manual review.
+
+**Database migrations required the most human intervention.** Migrations are sequential, state-dependent, and destructive if wrong. Claude could generate correct SQL for a new table easily. But a migration that alters an existing table with data? I wrote those myself or heavily supervised.
+
+**The frontend was the easiest part.** This surprised me. React components, Next.js pages, the topology canvas — Claude handled these with minimal architectural guidance. The frontend has fewer cross-cutting concerns than the backend. Each page is relatively self-contained. This is where AI coding agents genuinely shine.
+
+**Test quality varied.** Claude writes tests. But early on, it wrote tests that tested implementation details rather than behavior. "Assert that this function was called with these arguments" instead of "assert that the output is correct." I had to add testing philosophy to CLAUDE.md: test behavior, not implementation.
+
+## What AI Coding Agents Cannot Do (Yet)
+
+Three hard limits I hit:
+
+1. **They cannot own your architecture.** They can implement patterns. They cannot decide which patterns to use across a system of 15+ interacting modules. That requires understanding trade-offs that span more context than any model currently holds.
+
+2. **They are non-deterministic on structural decisions.** Same prompt, different session, different file structure. For implementation — writing a function that sorts a list — this doesn't matter. For architecture — where to put the settlement adapter interface — it matters enormously.
+
+3. **They don't understand your business constraints.** Why money is in cents. Why pricing snapshots freeze at billing time. Why secp256k1 instead of OAuth. These are business and security decisions informed by domain knowledge the model doesn't have.
+
+## The Meta Angle
+
+There's an irony here worth naming.
+
+ASC is a coordination platform for AI agent services. It coordinates agents across organizational boundaries — routing, handoffs, SLAs, quality gates, billing.
+
+It was built by coordinating AI agents across context boundaries — sub-agents, parallel exploration, verification workflows.
+
+The patterns are the same. The coordination problem is the same. The solution is the same: you need infrastructure between the agents.
+
+For ASC's codebase, that infrastructure was CLAUDE.md, sub-agent workflows, and a human architect.
+
+For the agent services economy, that infrastructure is ASC.
+
+---
+
+## Frequently Asked Questions
+
+### Can you build a production app with Claude Code?
+
+Yes, but production-grade results require treating Claude Code as a contractor, not a magic wand. The key is architectural discipline: CLAUDE.md files that enforce design philosophy, sub-agents for parallel work, and human oversight on structural decisions. ASC shipped with 480+ tests, 21 database tables, crypto identity, and settlement infrastructure — all built with Claude Code.
+
+### How do you use Claude Code sub-agents for large projects?
+
+Sub-agents work best when you use them like a development team: one agent explores existing patterns, another reads docs or tests, then you synthesize before writing. For ASC, parallel sub-agents handled exploration, implementation, and verification simultaneously — cutting build time while maintaining architectural coherence across 15+ type files.
+
+### Does vibe coding work for complex infrastructure?
+
+Not the way most people do it. Pure "vibe coding" — describe and hope — falls apart past a few thousand lines. What works is treating the AI agent as a senior contractor: you own the architecture, enforce patterns through CLAUDE.md, and use sub-agents to parallelize independent work.
+
+### What is CLAUDE.md and why does it matter?
+
+CLAUDE.md is a project instruction file that Claude Code reads at the start of every session. For serious projects, it should encode design philosophy — not just coding standards. Architecture decisions like "money in cents" or "provider interface = 3 endpoints" keep the agent aligned across sessions that can't share context.
+
+### How does Claude Code compare to Cursor for large projects?
+
+Claude Code operates as an autonomous terminal agent — it reads files, runs commands, executes tests, and manages git. Cursor is an IDE-integrated assistant. For large infrastructure projects, Claude Code's sub-agent architecture and terminal-native operation made it better suited for parallel work across multiple modules.
+
+### Can AI coding agents handle large codebases?
+
+They can, but the approach changes. At scale, you use sub-agents to explore specific modules, maintain strict CLAUDE.md files that encode architecture decisions, and keep files small and focused. Coherence comes from encoded patterns, not raw context.
+
+### What are the limitations of building with AI coding agents?
+
+Three main limitations: non-deterministic behavior on structural decisions, context drift where agents "forget" established patterns, and inability to own architecture. The agent implements; the human decides.
+
+### How do you maintain architectural coherence with AI-generated code?
+
+Four practices: branded types for compile-time safety, CLAUDE.md encoding design philosophy, small focused files for bounded context, and verification sub-agents after every implementation step.
+
+---
+
+*ASC is open source under FSL-1.1-MIT (converts to MIT 2028). The repo, tests, and architecture are available for inspection.*
+
+*For more on the coordination gap in AI agent infrastructure, subscribe to [The Coordination Gap](https://thecoordinationgap.beehiiv.com) newsletter.*

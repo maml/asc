@@ -8,10 +8,13 @@ export interface ArticleMeta {
   date: string;
   tags: string[];
   slug: string;
+  author?: string;
 }
 
 export interface Article extends ArticleMeta {
   content: string;
+  schemaArticle?: string;
+  schemaFaq?: string;
 }
 
 const ARTICLES_DIR = path.join(process.cwd(), "content/articles");
@@ -31,11 +34,14 @@ export function getArticleBySlug(slug: string): Article {
 
   return {
     title: data.title,
-    description: data.description,
-    date: data.date,
-    tags: data.tags ?? [],
+    description: data.meta_description ?? data.description,
+    date: data.date_created ?? data.date,
+    tags: data.tags ?? data.secondary_keywords ?? [],
     slug,
+    author: data.author,
     content,
+    schemaArticle: data.schema_article,
+    schemaFaq: data.schema_faq,
   };
 }
 

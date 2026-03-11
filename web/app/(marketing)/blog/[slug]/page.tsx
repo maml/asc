@@ -52,6 +52,18 @@ export default async function ArticlePage({
 
   return (
     <>
+      {article.schemaArticle && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: article.schemaArticle }}
+        />
+      )}
+      {article.schemaFaq && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: article.schemaFaq }}
+        />
+      )}
       <Nav />
       <main className="min-h-screen pt-24 pb-16 px-6">
         <article className="mx-auto max-w-[720px]">
@@ -71,6 +83,11 @@ export default async function ArticlePage({
               {article.title}
             </h1>
             <p className="text-gray mt-3">{article.description}</p>
+            {article.author && (
+              <p className="font-mono text-xs text-gray mt-4">
+                By {article.author}
+              </p>
+            )}
           </header>
 
           <div className="prose-asc">
