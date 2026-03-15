@@ -34,3 +34,4 @@ pgdata/
 # Misc
 .vercel
 .turbo
+.env*.local
