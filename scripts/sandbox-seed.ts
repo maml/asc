@@ -4,7 +4,7 @@
 import { registerProvider, registerConsumer, AscProvider, AscConsumer } from "@asc-so/client";
 import type { ProviderId, ConsumerId } from "@asc-so/client";
 
-const BASE_URL = process.env["ASC_BASE_URL"] ?? "http://localhost:3100";
+const BASE_URL = process.env["ASC_BASE_URL"] ?? `http://localhost:${process.env["EEG_PORT_ASC_API"] ?? 3100}`;
 const WEBHOOK_URL = `${BASE_URL}/sandbox-webhook`;
 
 async function main(): Promise<void> {

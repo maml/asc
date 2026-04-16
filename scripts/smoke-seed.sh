@@ -6,7 +6,7 @@
 
 set -euo pipefail
 
-BASE="${1:-http://localhost:3100}"
+BASE="${1:-http://localhost:${EEG_PORT_ASC_API:-3100}}"
 BOLD="\033[1m"
 DIM="\033[2m"
 GREEN="\033[32m"

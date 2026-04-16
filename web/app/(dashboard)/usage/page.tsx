@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { BarChart3, DollarSign, Hash, TrendingUp, Activity } from "lucide-react";
 import { EmptyState } from "../components/empty-state";
 
+// Default port from EEG_PORT_ASC_API (3100); override via NEXT_PUBLIC_API_URL
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3100";
 
 interface BillingEvent {

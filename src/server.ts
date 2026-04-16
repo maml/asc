@@ -2,7 +2,7 @@ import { getPool, closePool } from "./db/pool.js";
 import { runMigrations } from "./db/migrate.js";
 import { buildApp } from "./app.js";
 
-const PORT = parseInt(process.env["PORT"] ?? "3100", 10);
+const PORT = parseInt(process.env["PORT"] ?? process.env["EEG_PORT_ASC_API"] ?? "3100", 10);
 
 async function main(): Promise<void> {
   await runMigrations();

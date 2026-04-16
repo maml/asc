@@ -5,6 +5,7 @@ import { ListTodo, Plus, RefreshCw, X, Clock, AlertCircle, CheckCircle2, Loader2
 
 import { EmptyState } from "../components/empty-state";
 
+// Default port from EEG_PORT_ASC_API (3100); override via NEXT_PUBLIC_API_URL
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3100";
 
 interface Task {

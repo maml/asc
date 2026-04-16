@@ -5,7 +5,7 @@ import type { AgentId, ConsumerId, TaskId } from "../../src/types/brand.js";
 import type { SeedResult } from "./seed.js";
 import { sampleContract } from "./sample-contract.js";
 
-const ASC = "http://127.0.0.1:3100";
+const ASC = `http://127.0.0.1:${process.env["EEG_PORT_ASC_API"] ?? 3100}`;
 const POLL_INTERVAL_MS = 300;
 
 interface TaskResult {

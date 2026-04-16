@@ -11,7 +11,7 @@ export function getTestPool(): pg.Pool {
   if (!testPool) {
     testPool = new pg.Pool({
       host: process.env["DB_HOST"] ?? "localhost",
-      port: parseInt(process.env["DB_PORT"] ?? "5433", 10),
+      port: parseInt(process.env["DB_PORT"] ?? process.env["EEG_PORT_POSTGRES"] ?? "5433", 10),
       user: process.env["DB_USER"] ?? "asc",
       password: process.env["DB_PASSWORD"] ?? "asc_dev_password",
       database: process.env["DB_NAME"] ?? "asc_test",

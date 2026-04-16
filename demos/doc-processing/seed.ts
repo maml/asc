@@ -5,7 +5,7 @@ import type { AgentId, ProviderId, ConsumerId } from "../../src/types/brand.js";
 import { wireDefaultHandlers as wireDocAI } from "./providers/docai-server.js";
 import { wireDefaultHandlers as wireLegalAI } from "./providers/legalai-server.js";
 
-const ASC = "http://127.0.0.1:3100";
+const ASC = `http://127.0.0.1:${process.env["EEG_PORT_ASC_API"] ?? 3100}`;
 
 async function post(path: string, body: unknown): Promise<unknown> {
   const res = await fetch(`${ASC}${path}`, {

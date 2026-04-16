@@ -4,6 +4,7 @@ import { useEffect, useState, useMemo, Fragment } from "react";
 import { GitBranch, ChevronRight, ChevronDown, RefreshCw } from "lucide-react";
 import { EmptyState } from "../components/empty-state";
 
+// Default port from EEG_PORT_ASC_API (3100); override via NEXT_PUBLIC_API_URL
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3100";
 
 interface SpanEvent {
