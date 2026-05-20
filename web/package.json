@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 3200",
+    "dev": "next dev --port ${EEG_PORT_ASC_WEB:-3200}",
     "prebuild": "tsx scripts/collect-stats.ts",
     "build": "next build",
     "start": "next start",
